@@ -31,12 +31,12 @@ app.post('/api/generar', async (req, res) => {
       },
       body: JSON.stringify({
         model:       'llama-3.3-70b-versatile',
-        max_tokens:  1200,
+        max_tokens:  2048,
         temperature: 0.7,
         messages: [
           {
             role:    'system',
-            content: 'Eres un generador de ítems de evaluación para la Prueba Nacional Estandarizada de Matemáticas de Costa Rica. Respondes ÚNICAMENTE con JSON válido, sin backticks ni texto adicional.'
+            content: 'Eres un generador de ítems de evaluación para la Prueba Nacional Estandarizada de Matemáticas de Costa Rica. Respondes ÚNICAMENTE con JSON válido, sin backticks ni texto adicional. Nunca truncues el JSON — siempre cierra todos los corchetes y llaves.'
           },
           {
             role:    'user',
@@ -77,7 +77,7 @@ app.post('/api/generar', async (req, res) => {
 
 // ── Health check ──────────────────────────────────────────
 app.get('/health', (req, res) => {
-  res.json({ estado: 'ok', modelo: 'llama-3.3-70b-versatile', version: '1.0' });
+  res.json({ estado: 'ok', modelo: 'llama-3.3-70b-versatile', version: '1.1' });
 });
 
 // ── Arrancar servidor ─────────────────────────────────────
