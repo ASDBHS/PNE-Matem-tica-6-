@@ -1,7 +1,4 @@
-// ══════════════════════════════════════════════════════════
-//  API SERVERLESS — MatemáticasPRO · SDBHS
-//  Vercel Serverless Function · Groq API (gratuita)
-// ══════════════════════════════════════════════════════════
+const fetch = require('node-fetch');
 
 function mezclarOpciones(opciones, claveOriginal) {
   const letras = ['A', 'B', 'C', 'D'];
@@ -20,8 +17,7 @@ function mezclarOpciones(opciones, claveOriginal) {
   return { opciones: nuevasOpciones, clave: nuevaClave };
 }
 
-export default async function handler(req, res) {
-  // CORS
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -65,7 +61,14 @@ Responde SIEMPRE con un objeto JSON válido con exactamente estas claves:
 - opciones: objeto con claves A, B, C, D
 - clave: string ("A", "B", "C" o "D") en posición ALEATORIA
 - pista: string (pregunta orientadora sin revelar la respuesta)
-- pasos_resolucion: array de exactamente 4 objetos con "titulo" y "explicacion" detallada`
+- pasos_resolucion: array de exactamente 4 objetos con "titulo" y "explicacion" detallada
+
+VERIFICACIÓN OBLIGATORIA antes de responder:
+1. Resolvé el problema vos mismo paso a paso
+2. Confirmá que la clave coincide exactamente con tu resultado
+3. Confirmá que los tres distractores son incorrectos
+4. Si encontrás cualquier inconsistencia, corregí el ejercicio antes de responder
+5. NUNCA generes un ejercicio donde la respuesta correcta no esté entre las opciones`
           },
           { role: 'user', content: prompt }
         ]
@@ -97,4 +100,4 @@ Responde SIEMPRE con un objeto JSON válido con exactamente estas claves:
     console.error(err);
     return res.status(500).json({ error: err.message });
   }
-}
+};
