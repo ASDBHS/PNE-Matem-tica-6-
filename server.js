@@ -1,8 +1,3 @@
-// ══════════════════════════════════════════════════════════
-//  SERVIDOR PROXY — MatemáticasPRO · SDBHS
-//  Node.js + Express · Groq API (gratuita)
-// ══════════════════════════════════════════════════════════
-
 const express = require('express');
 const cors    = require('cors');
 const fetch   = require('node-fetch');
@@ -12,15 +7,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
-// ── Ruta principal: proxy hacia Groq ──────────────────────
 app.post('/api/generar', async (req, res) => {
   const { prompt } = req.body;
-
-  if (!prompt) {
-    return res.status(400).json({ error: 'Falta el campo prompt' });
-  }
+  if (!prompt) return res.status(400).json({ error: 'Falta prompt' });
 
   try {
     const respuesta = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -31,56 +22,52 @@ app.post('/api/generar', async (req, res) => {
       },
       body: JSON.stringify({
         model:       'llama-3.3-70b-versatile',
-        max_tokens:  2048,
+        max_tokens:  3000,
         temperature: 0.7,
+        response_format: { type: 'json_object' },
         messages: [
           {
             role:    'system',
-            content: 'Eres un generador de ítems de evaluación para la Prueba Nacional Estandarizada de Matemáticas de Costa Rica. Respondes ÚNICAMENTE con JSON válido, sin backticks ni texto adicional. Nunca truncues el JSON — siempre cierra todos los corchetes y llaves.'
+            content: `Eres un generador de ítems para la Prueba Nacional de Matemáticas de Costa Rica, 6° grado.
+Responde SIEMPRE con un objeto JSON válido con exactamente estas claves:
+- contexto_situacional: string (puede ser vacío)
+- enunciado: string
+- opciones: objeto con claves A, B, C, D (cada una string)
+- clave: string (debe ser "A", "B", "C" o "D")
+- pista: string
+- pasos_resolucion: array de exactamente 4 objetos, cada uno con "titulo" y "explicacion" (ambos strings cortos)`
           },
-          {
-            role:    'user',
-            content: prompt
-          }
+          { role: 'user', content: prompt }
         ]
       })
     });
 
     const datos = await respuesta.json();
-
-    if (datos.error) {
-      return res.status(500).json({ error: datos.error.message });
-    }
+    if (datos.error) return res.status(500).json({ error: datos.error.message });
 
     const texto = datos.choices?.[0]?.message?.content || '';
+    if (!texto) return res.status(500).json({ error: 'Respuesta vacía' });
 
-    if (!texto) {
-      return res.status(500).json({ error: 'Respuesta vacía de Groq' });
-    }
-
-    // Extraer JSON robusto
+    // Parsear y re-serializar para garantizar JSON limpio
     const ini = texto.indexOf('{');
     const fin = texto.lastIndexOf('}');
-
-    if (ini === -1 || fin === -1) {
-      return res.status(500).json({ error: 'Respuesta sin JSON válido' });
-    }
+    if (ini === -1 || fin === -1) return res.status(500).json({ error: 'Sin JSON' });
 
     const ejercicio = JSON.parse(texto.substring(ini, fin + 1));
+
+    // Validar estructura mínima
+    if (!ejercicio.enunciado || !ejercicio.opciones || !ejercicio.clave) {
+      return res.status(500).json({ error: 'JSON incompleto' });
+    }
+
     res.json(ejercicio);
 
   } catch (err) {
-    console.error('Error en proxy:', err);
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ── Health check ──────────────────────────────────────────
-app.get('/health', (req, res) => {
-  res.json({ estado: 'ok', modelo: 'llama-3.3-70b-versatile', version: '1.1' });
-});
+app.get('/health', (req, res) => res.json({ ok: true }));
 
-// ── Arrancar servidor ─────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en puerto ${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ Puerto ${PORT}`));
