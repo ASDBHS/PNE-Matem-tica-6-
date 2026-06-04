@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatemáticasPRO · Tutoría 6° Grado · SDBHS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul:    #1B3A6B;
+    --azul-m:  #2563EB;
+    --azul-cl: #DBEAFE;
+    --amarillo:#F59E0B;
+    --verde:   #10B981;
+    --rojo:    #EF4444;
+    --gris:    #F1F5F9;
+    --blanco:  #FFFFFF;
+    --texto:   #1E293B;
+    --sombra:  0 4px 24px rgba(27,58,107,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--gris);color:var(--texto);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+  /* HEADER */
+  header{width:100%;background:var(--azul);color:#fff;padding:16px 28px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+  header .logo{font-size:1.8rem;}
+  header h1{font-size:1.25rem;font-weight:900;letter-spacing:-.5px;}
+  header p{font-size:.78rem;opacity:.7;font-weight:600;}
+  header .badge{margin-left:auto;background:var(--amarillo);color:var(--azul);font-weight:800;font-size:.72rem;padding:3px 10px;border-radius:20px;}
+
+  main{width:100%;max-width:720px;padding:24px 16px 60px;}
+
+  /* PROGRESO */
+  #prog-wrap{background:#fff;border-radius:14px;padding:14px 18px;margin-bottom:18px;box-shadow:var(--sombra);display:flex;align-items:center;gap:12px;}
+  #prog-label{font-weight:800;font-size:.88rem;color:var(--azul);white-space:nowrap;}
+  #prog-track{flex:1;background:var(--azul-cl);border-radius:20px;height:10px;overflow:hidden;}
+  #prog-fill{height:100%;background:linear-gradient(90deg,var(--azul-m),var(--verde));border-radius:20px;transition:width .5s;}
+  #corazones{display:flex;gap:3px;font-size:1.3rem;}
+  #bloque-badge{background:var(--azul-cl);color:var(--azul-m);font-size:.7rem;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+
+  /* CARD */
+  #card{background:#fff;border-radius:18px;box-shadow:var(--sombra);padding:28px 24px 24px;}
+
+  /* LOADER */
+  #loader{display:none;flex-direction:column;align-items:center;gap:12px;padding:40px 0;}
+  #loader.vis{display:flex;}
+  .spinner{width:40px;height:40px;border:4px solid var(--azul-cl);border-top-color:var(--azul-m);border-radius:50%;animation:girar .75s linear infinite;}
+  @keyframes girar{to{transform:rotate(360deg);}}
+  #loader-msg{font-weight:700;color:var(--azul);font-size:.95rem;}
+
+  /* EJERCICIO */
+  #contenido{display:none;}
+  #ctx-box{background:#EFF6FF;border-left:4px solid var(--azul-m);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:16px;font-size:.87rem;color:#1E40AF;font-weight:600;line-height:1.55;}
+  #enunciado{font-size:1.05rem;font-weight:700;line-height:1.65;margin-bottom:20px;}
+
+  .opcion{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;border:2px solid #E2E8F0;border-radius:12px;background:#fff;cursor:pointer;font-size:.97rem;font-weight:700;color:var(--texto);text-align:left;margin-bottom:10px;transition:all .15s;font-family:'Nunito',sans-serif;}
+  .opcion:hover:not([disabled]){border-color:var(--azul-m);background:var(--azul-cl);transform:translateX(3px);}
+  .opcion .letra{min-width:30px;height:30px;border-radius:50%;background:var(--gris);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;color:var(--azul);flex-shrink:0;transition:all .15s;}
+  .opcion:hover:not([disabled]) .letra{background:var(--azul-m);color:#fff;}
+  .opcion.correcta{border-color:var(--verde);background:#D1FAE5;pointer-events:none;}
+  .opcion.correcta .letra{background:var(--verde);color:#fff;}
+  .opcion.incorrecta{border-color:var(--rojo);background:#FEE2E2;pointer-events:none;}
+  .opcion.incorrecta .letra{background:var(--rojo);color:#fff;}
+  .opcion[disabled]{opacity:.4;pointer-events:none;}
+
+  /* PISTA */
+  #pista-box{display:none;margin-top:16px;background:#FFFBEB;border:2px dashed var(--amarillo);border-radius:12px;padding:12px 14px;font-size:.88rem;font-weight:700;color:#92400E;}
+  #pista-box.vis{display:block;animation:sd .3s ease;}
+  .pista-lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:var(--amarillo);margin-bottom:5px;}
+
+  /* AYUDA */
+  #ayuda-box{display:none;margin-top:16px;background:#F0FDF4;border:2px solid var(--verde);border-radius:14px;padding:16px 18px;}
+  #ayuda-box.vis{display:block;animation:sd .3s ease;}
+  .ayuda-lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:var(--verde);margin-bottom:10px;font-weight:800;}
+  .paso{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+  .paso .num{min-width:24px;height:24px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0;}
+  .paso p{font-size:.88rem;color:#065F46;line-height:1.5;}
+
+  @keyframes sd{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* FEEDBACK */
+  #feedback{display:none;margin-top:14px;padding:12px 16px;border-radius:10px;font-size:.93rem;font-weight:700;text-align:center;}
+  #feedback.ok  {display:block;background:#D1FAE5;color:#065F46;border:2px solid var(--verde);}
+  #feedback.err {display:block;background:#FEE2E2;color:#991B1B;border:2px solid var(--rojo);}
+  #feedback.warn{display:block;background:#FFFBEB;color:#92400E;border:2px solid var(--amarillo);}
+
+  /* BOTÓN SIGUIENTE */
+  #btn-sig{display:none;width:100%;margin-top:18px;padding:14px;background:linear-gradient(135deg,var(--azul-m),var(--azul));color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform .15s,box-shadow .15s;}
+  #btn-sig:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(37,99,235,.4);}
+  #btn-sig.vis{display:block;}
+
+  /* PANTALLA INICIO */
+  #P-inicio{background:#fff;border-radius:18px;box-shadow:var(--sombra);padding:36px 24px;text-align:center;}
+  #P-inicio .icon{font-size:4.5rem;margin-bottom:14px;}
+  #P-inicio h2{font-size:1.55rem;font-weight:900;color:var(--azul);margin-bottom:8px;}
+  #P-inicio p{color:#475569;font-weight:600;font-size:.92rem;line-height:1.6;margin-bottom:24px;max-width:460px;margin-left:auto;margin-right:auto;}
+  .bl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:24px;text-align:left;}
+  .bl-item{background:var(--azul-cl);border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:var(--azul);display:flex;gap:7px;align-items:center;}
+  #btn-ini{background:linear-gradient(135deg,var(--azul-m),var(--azul));color:#fff;border:none;border-radius:14px;padding:16px 44px;font-size:1.1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 18px rgba(37,99,235,.3);}
+  #btn-ini:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(37,99,235,.4);}
+
+  /* RESUMEN */
+  #P-resumen{display:none;background:#fff;border-radius:18px;box-shadow:var(--sombra);padding:36px 24px;text-align:center;}
+  #P-resumen h2{font-size:1.7rem;font-weight:900;color:var(--azul);margin-bottom:6px;}
+  #P-resumen .sub{color:#64748B;font-weight:600;margin-bottom:24px;}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+  .stat{background:var(--gris);border-radius:12px;padding:14px 8px;}
+  .stat .v{font-size:1.9rem;font-weight:900;color:var(--azul-m);}
+  .stat .l{font-size:.72rem;font-weight:700;color:#64748B;}
+  #btn-rei{background:linear-gradient(135deg,var(--amarillo),#D97706);color:#fff;border:none;border-radius:14px;padding:14px 32px;font-size:1rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform .15s;}
+  #btn-rei:hover{transform:translateY(-2px);}
+
+  /* CONFETTI */
+  .cp{position:fixed;pointer-events:none;z-index:999;border-radius:2px;animation:caer 1.8s ease-in forwards;}
+  @keyframes caer{0%{transform:translateY(0) rotate(0);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+
+  @media(max-width:500px){.bl-grid{grid-template-columns:1fr;} #card{padding:20px 14px;}}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">🧮</span>
+  <div><h1>MatemáticasPRO</h1><p>Tutoría adaptativa · 6° Grado · SDBHS</p></div>
+  <span class="badge">DGEC 2026</span>
+</header>
+
+<main>
+
+  <!-- INICIO -->
+  <div id="P-inicio">
+    <div class="icon">🎯</div>
+    <h2>¡Prepárate para la Prueba Nacional!</h2>
+    <p>Ejercicios generados por IA, distintos cada vez, alineados al Marco de Especificaciones de Matemáticas <strong>DGEC 2026</strong>.</p>
+    <div class="bl-grid">
+      <div class="bl-item">📐 Números y operaciones</div>
+      <div class="bl-item">📏 Geometría</div>
+      <div class="bl-item">📊 Medidas</div>
+      <div class="bl-item">🔢 Relaciones y Álgebra</div>
+      <div class="bl-item">📈 Estadística y Probabilidad</div>
+      <div class="bl-item">🎲 Situaciones aleatorias</div>
+    </div>
+    <button id="btn-ini" onclick="iniciar()">¡Comenzar práctica! 🚀</button>
+  </div>
+
+  <!-- PROGRESO -->
+  <div id="prog-wrap" style="display:none;">
+    <span id="prog-label">Ejercicio 1 de 20</span>
+    <div id="prog-track"><div id="prog-fill" style="width:0%"></div></div>
+    <div id="corazones"></div>
+    <span id="bloque-badge">—</span>
+  </div>
+
+  <!-- CARD EJERCICIO -->
+  <div id="card" style="display:none;">
+    <div id="loader">
+      <div class="spinner"></div>
+      <p id="loader-msg">Generando ejercicio...</p>
+    </div>
+    <div id="contenido">
+      <div id="ctx-box" style="display:none;"></div>
+      <div id="enunciado"></div>
+      <div id="opciones"></div>
+      <div id="pista-box"><div class="pista-lbl">💡 Pista</div><div id="pista-texto"></div></div>
+      <div id="ayuda-box"><div class="ayuda-lbl">📚 Así se resuelve</div><div id="pasos"></div></div>
+      <div id="feedback"></div>
+      <button id="btn-sig" onclick="siguiente()">Siguiente ejercicio →</button>
+    </div>
+  </div>
+
+  <!-- RESUMEN -->
+  <div id="P-resumen">
+    <div style="font-size:3.5rem;margin-bottom:10px;" id="trofeo">🏆</div>
+    <h2 id="res-titulo">¡Sesión completada!</h2>
+    <div style="text-align:center;margin:16px 0 20px;">
+      <div id="nota-valor" style="font-size:3rem;font-weight:900;line-height:1;">—</div>
+      <div id="nota-texto" style="font-size:1rem;font-weight:700;color:#64748B;margin-top:4px;">—</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v" id="s-cor">0</div><div class="l">Al primer intento</div></div>
+      <div class="stat"><div class="v" id="s-ay">0</div><div class="l">Con ayuda</div></div>
+      <div class="stat"><div class="v" id="s-bl">0</div><div class="l">Bloques practicados</div></div>
+    </div>
+    <div id="mejoras-seccion" style="display:none;margin:20px 0;">
+      <div style="font-weight:800;color:#1B3A6B;font-size:1rem;margin-bottom:12px;">📊 Puntos a mejorar</div>
+      <div id="mejoras-lista"></div>
+    </div>
+    <button id="btn-rei" onclick="iniciar()">🔄 Nueva sesión</button>
+  </div>
+
+</main>
+
+<script>
+const TOTAL = 20;
+const BLOQUES = [
+  {id:1,nombre:"Números",afirmaciones:[
+    "Reconoce representaciones de números naturales (≥100000) y decimales hasta la diezmilésima",
+    "Compara números naturales, fracciones o decimales con los símbolos <, > o =",
+    "Resuelve problemas sobre múltiplos, números pares o impares, y divisibilidad por 2, 3, 5 o 10",
+    "Resuelve problemas con las cuatro operaciones aritméticas sobre números naturales o decimales",
+    "Resuelve problemas con fracciones propias, impropias, notación mixta, homogéneas y heterogéneas",
+    "Reconoce redondeo de decimales y conversión entre fracción y número decimal"
+  ]},
+  {id:2,nombre:"Geometría",afirmaciones:[
+    "Reconoce figuras planas, sus elementos y propiedades: triángulos, cuadriláteros, polígonos",
+    "Clasifica triángulos según sus ángulos o lados; clasifica cuadriláteros en paralelogramos y no paralelogramos",
+    "Identifica prismas rectangulares, cubos y cilindros; reconoce sus elementos y propiedades",
+    "Determina perímetros y áreas de triángulos, cuadriláteros y figuras planas compuestas",
+    "Reconoce ejes de simetría, figuras simétricas y puntos homólogos respecto a una recta",
+    "Ubica puntos y figuras en coordenadas (primer cuadrante); reconoce figuras obtenidas por traslación"
+  ]},
+  {id:3,nombre:"Medidas",afirmaciones:[
+    "Determina conversiones entre unidades de superficie, temperatura (Celsius-Fahrenheit) y tiempo",
+    "Resuelve problemas de conversión entre longitud, masa, capacidad, temperatura o tiempo",
+    "Reconoce relaciones entre monedas y billetes del sistema monetario costarricense",
+    "Resuelve problemas que involucran el sistema monetario nacional costarricense"
+  ]},
+  {id:4,nombre:"Relaciones y Álgebra",afirmaciones:[
+    "Resuelve problemas con patrones en sucesiones de figuras o representaciones geométricas",
+    "Resuelve problemas con patrones en sucesiones numéricas o tablas con números naturales menores que 1000000",
+    "Determina relaciones entre dos cantidades presentadas en tablas o escalas de figuras gráficas",
+    "Determina el valor desconocido (incógnita) en una ecuación matemática dada"
+  ]},
+  {id:5,nombre:"Estadística y Probabilidad",afirmaciones:[
+    "Interpreta información en tablas, diagramas o gráficos estadísticos",
+    "Interpreta moda, media aritmética, máximo y mínimo de datos en tablas o gráficos",
+    "Reconoce recorrido, población, muestra e interpreta frecuencia porcentual",
+    "Reconoce situaciones aleatorias e identifica resultados simples de un experimento",
+    "Determina eventos más, igualmente o menos probables; identifica eventos seguros, probables o imposibles"
+  ]}
+];
+const CTXS = ['personal','comunitario','ocupacional y productivo','científico'];
+
+let E = {};
+function reset(){ E = {idx:0,intentos:0,corrPrimer:0,conAyuda:0,bloques:new Set(),data:null,historial:[],bloqueActual:''}; }
+
+function show(p){
+  document.getElementById('P-inicio').style.display   = p==='inicio'  ?'block':'none';
+  document.getElementById('prog-wrap').style.display  = p==='ejercicio'?'flex' :'none';
+  document.getElementById('card').style.display       = p==='ejercicio'?'block':'none';
+  document.getElementById('P-resumen').style.display  = p==='resumen' ?'block':'none';
+}
+
+function iniciar(){ reset(); show('ejercicio'); actualizarProg(); generar(); }
+
+function actualizarProg(){
+  document.getElementById('prog-label').textContent = `Ejercicio ${E.idx+1} de ${TOTAL}`;
+  document.getElementById('prog-fill').style.width  = `${(E.idx/TOTAL)*100}%`;
+  const c = document.getElementById('corazones'); c.innerHTML='';
+  for(let i=0;i<3;i++){const s=document.createElement('span');s.textContent=i<(3-E.intentos)?'❤️':'🖤';c.appendChild(s);}
+}
+
+async function generar(){
+  const bloque = BLOQUES[E.idx % BLOQUES.length];
+  E.bloques.add(bloque.nombre); E.intentos=0; E.bloqueActual=bloque.nombre;
+  document.getElementById('bloque-badge').textContent = `Bloque ${bloque.id}: ${bloque.nombre}`;
+  document.getElementById('loader').classList.add('vis');
+  document.getElementById('contenido').style.display='none';
+  document.getElementById('pista-box').classList.remove('vis');
+  document.getElementById('ayuda-box').classList.remove('vis');
+  document.getElementById('feedback').className='';
+  document.getElementById('btn-sig').classList.remove('vis');
+  actualizarProg();
+
+  const afirm = bloque.afirmaciones[Math.floor(Math.random()*bloque.afirmaciones.length)];
+  const ctx   = CTXS[Math.floor(Math.random()*CTXS.length)];
+  const seed  = Math.floor(Math.random()*9000)+1000;
+
+  const prompt = `Genera un ítem de selección única para la Prueba Nacional Estandarizada Diagnóstica de Matemáticas 2026 de Costa Rica, 6° grado primaria.
+
+BLOQUE: ${bloque.id} — ${bloque.nombre}
+AFIRMACIÓN: ${afirm}
+TIPO DE CONTEXTO: ${ctx}
+SEMILLA DE VARIACIÓN: ${seed}
+
+NIVEL DE COMPLEJIDAD: Intermedio-avanzado. El problema debe requerir análisis y razonamiento, no solo cálculo directo. Usá alguno de estos enfoques:
+- Problema de dos o tres pasos donde el estudiante decide qué operaciones usar
+- Situación con información extra que el estudiante debe identificar y descartar
+- Problema inverso: dado el resultado, encontrar el dato faltante
+- Interpretación de datos con una conclusión de análisis
+- Situación cotidiana costarricense real (colones, frutas locales, transportes, lugares del país)
+
+DISTRACTORES: Los tres incorrectos deben representar errores de razonamiento típicos de estudiantes de 6° grado, no valores absurdos.
+
+PISTA: Una pregunta orientadora que ayude al estudiante a identificar el camino correcto sin revelar la respuesta.
+
+PASOS DE RESOLUCIÓN: Explicaciones detalladas con los números concretos del problema.
+
+Responde ÚNICAMENTE con JSON válido sin backticks ni texto extra.`;
+
+  try {
+    // ── Llama al servidor proxy (misma URL, ruta /api/generar) ──
+    const res  = await fetch('/api/generar', {
+      method:  'POST',
+      headers: {'Content-Type':'application/json'},
+      body:    JSON.stringify({ prompt })
+    });
+    if(!res.ok){ const e=await res.json(); throw new Error(e.error||'Error del servidor'); }
+    E.data = await res.json();
+    mostrar();
+  } catch(e){
+    document.getElementById('loader-msg').textContent = '⚠️ '+e.message+'. Reintentando...';
+    setTimeout(generar, 3000);
+  }
+}
+
+function mostrar(){
+  document.getElementById('loader').classList.remove('vis');
+  document.getElementById('contenido').style.display='block';
+  const d=E.data;
+  const cb=document.getElementById('ctx-box');
+  if(d.contexto_situacional&&d.contexto_situacional.trim()){cb.textContent=d.contexto_situacional;cb.style.display='block';}
+  else{cb.style.display='none';}
+  document.getElementById('enunciado').textContent=d.enunciado;
+  const op=document.getElementById('opciones'); op.innerHTML='';
+  ['A','B','C','D'].forEach(l=>{
+    const b=document.createElement('button'); b.className='opcion';
+    b.innerHTML=`<span class="letra">${l}</span><span>${d.opciones[l]}</span>`;
+    b.onclick=()=>responder(l); op.appendChild(b);
+  });
+}
+
+function responder(sel){
+  const d=E.data,ok=sel===d.clave; E.intentos++;
+  const bots=document.querySelectorAll('.opcion');
+  const fb=document.getElementById('feedback');
+  if(ok){
+    bots.forEach(b=>{const l=b.querySelector('.letra').textContent;if(l===sel)b.classList.add('correcta');else b.setAttribute('disabled','');});
+    if(E.intentos===1){E.corrPrimer++;E.historial.push({bloque:E.bloqueActual,correctoPrimer:true});fb.className='ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}
+    else if(E.intentos===2){E.historial.push({bloque:E.bloqueActual,correctoPrimer:false});fb.className='ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}
+    else{E.conAyuda++;E.historial.push({bloque:E.bloqueActual,correctoPrimer:false});fb.className='warn';fb.textContent='👍 Correcto. Repasá los pasos para afianzar el tema.';}
+    document.getElementById('btn-sig').classList.add('vis');
+  } else {
+    bots.forEach(b=>{if(b.querySelector('.letra').textContent===sel)b.classList.add('incorrecta');});
+    if(E.intentos===1){
+      fb.className='err'; fb.textContent='❌ No es correcta. Revisá la pista e intentá de nuevo.';
+      document.getElementById('pista-texto').textContent=d.pista;
+      document.getElementById('pista-box').classList.add('vis');
+      setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);
+    } else if(E.intentos===2){
+      fb.className='err'; fb.textContent='❌ Casi. Estudiemos cómo se resuelve.';
+      const ps=document.getElementById('pasos'); ps.innerHTML='';
+      d.pasos_resolucion.forEach((p,i)=>{ps.innerHTML+=`<div class="paso"><div class="num">${i+1}</div><p><strong>${p.titulo}:</strong> ${p.explicacion}</p></div>`;});
+      document.getElementById('ayuda-box').classList.add('vis');
+      setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);
+    }
+    actualizarProg();
+  }
+}
+
+function siguiente(){
+  E.idx++;
+  if(E.idx>=TOTAL){resumen();return;}
+  document.getElementById('pista-box').classList.remove('vis');
+  document.getElementById('ayuda-box').classList.remove('vis');
+  document.getElementById('feedback').className='';
+  document.getElementById('btn-sig').classList.remove('vis');
+  generar();
+}
+
+function resumen(){
+  show('resumen');
+  const pct = Math.round((E.corrPrimer/TOTAL)*100);
+
+  // Nota sobre 100
+  let nota, trofeo, titulo, color;
+  if(pct>=90){ nota='Excelente'; trofeo='🏆'; titulo='¡Resultado sobresaliente!'; color='#065F46'; }
+  else if(pct>=80){ nota='Muy bueno'; trofeo='🥇'; titulo='¡Muy buen desempeño!'; color='#065F46'; }
+  else if(pct>=70){ nota='Bueno'; trofeo='🥈'; titulo='¡Buen trabajo!'; color='#1E40AF'; }
+  else if(pct>=60){ nota='Regular'; trofeo='🥉'; titulo='Hay áreas por reforzar'; color='#92400E'; }
+  else{ nota='Necesita refuerzo'; trofeo='💪'; titulo='¡Seguí practicando!'; color='#991B1B'; }
+
+  document.getElementById('trofeo').textContent = trofeo;
+  document.getElementById('res-titulo').textContent = titulo;
+  document.getElementById('s-cor').textContent = E.corrPrimer;
+  document.getElementById('s-ay').textContent  = E.conAyuda;
+  document.getElementById('s-bl').textContent  = E.bloques.size;
+
+  // Nota visual
+  document.getElementById('nota-valor').textContent  = pct + '%';
+  document.getElementById('nota-texto').textContent  = nota;
+  document.getElementById('nota-valor').style.color  = color;
+
+  // Puntos a mejorar por bloque
+  const mejoras = [];
+  const bloquesFallados = {};
+  E.historial.forEach(h => {
+    if(!h.correctoPrimer){
+      if(!bloquesFallados[h.bloque]) bloquesFallados[h.bloque] = { fallados:0, total:0 };
+      bloquesFallados[h.bloque].fallados++;
+    }
+    if(!bloquesFallados[h.bloque]) bloquesFallados[h.bloque] = { fallados:0, total:0 };
+    bloquesFallados[h.bloque].total++;
+  });
+
+  const recomendaciones = {
+    'Números':                    'Practicá operaciones con decimales, fracciones y divisibilidad.',
+    'Geometría':                  'Repasá perímetros, áreas y clasificación de figuras.',
+    'Medidas':                    'Reforzá conversiones del sistema métrico y el sistema monetario.',
+    'Relaciones y Álgebra':       'Trabajá patrones numéricos y ecuaciones con incógnita.',
+    'Estadística y Probabilidad': 'Practicá lectura de gráficos y cálculo de media y moda.'
+  };
+
+  const divMejoras = document.getElementById('mejoras-lista');
+  divMejoras.innerHTML = '';
+
+  let hayMejoras = false;
+  Object.entries(bloquesFallados).forEach(([bloque, datos]) => {
+    const pctBloque = Math.round(((datos.total - datos.fallados) / datos.total) * 100);
+    if(pctBloque < 80){
+      hayMejoras = true;
+      divMejoras.innerHTML += '<div style="background:#FEF3C7;border-left:4px solid #F59E0B;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:10px;">'
+        + '<div style="font-weight:800;color:#92400E;margin-bottom:4px;">📌 ' + bloque + ' — ' + pctBloque + '% de logro</div>'
+        + '<div style="font-size:.88rem;color:#78350F;">' + (recomendaciones[bloque]||'Repasá los contenidos de este bloque.') + '</div>'
+        + '</div>';
+    }
+  });
+
+  if(!hayMejoras){
+    divMejoras.innerHTML = '<div style="color:#065F46;font-weight:700;text-align:center;padding:12px;">✅ ¡Excelente desempeño en todos los bloques!</div>';
+  }
+
+  document.getElementById('mejoras-seccion').style.display = 'block';
+  if(pct>=80) confetti();
+}
+
+function confetti(){
+  const col=['#1B3A6B','#F59E0B','#10B981','#2563EB','#EF4444','#8B5CF6'];
+  for(let i=0;i<45;i++){
+    const d=document.createElement('div'); d.className='cp';
+    Object.assign(d.style,{top:'-10px',left:Math.random()*100+'vw',width:(Math.random()*9+5)+'px',height:(Math.random()*9+5)+'px',borderRadius:Math.random()>.5?'50%':'2px',background:col[Math.floor(Math.random()*col.length)],animationDelay:(Math.random()*.6)+'s',animationDuration:(Math.random()*.8+1.4)+'s'});
+    document.body.appendChild(d); setTimeout(()=>d.remove(),2800);
+  }
+}
+</script>
+</body>
+</html>
