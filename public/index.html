@@ -146,7 +146,7 @@
 
   <!-- PROGRESO -->
   <div id="prog-wrap" style="display:none;">
-    <span id="prog-label">Ejercicio 1 de 5</span>
+    <span id="prog-label">Ejercicio 1 de 20</span>
     <div id="prog-track"><div id="prog-fill" style="width:0%"></div></div>
     <div id="corazones"></div>
     <span id="bloque-badge">—</span>
@@ -173,11 +173,18 @@
   <div id="P-resumen">
     <div style="font-size:3.5rem;margin-bottom:10px;" id="trofeo">🏆</div>
     <h2 id="res-titulo">¡Sesión completada!</h2>
-    <p class="sub" id="res-sub"></p>
+    <div style="text-align:center;margin:16px 0 20px;">
+      <div id="nota-valor" style="font-size:3rem;font-weight:900;line-height:1;">—</div>
+      <div id="nota-texto" style="font-size:1rem;font-weight:700;color:#64748B;margin-top:4px;">—</div>
+    </div>
     <div class="stats">
       <div class="stat"><div class="v" id="s-cor">0</div><div class="l">Al primer intento</div></div>
       <div class="stat"><div class="v" id="s-ay">0</div><div class="l">Con ayuda</div></div>
       <div class="stat"><div class="v" id="s-bl">0</div><div class="l">Bloques practicados</div></div>
+    </div>
+    <div id="mejoras-seccion" style="display:none;margin:20px 0;">
+      <div style="font-weight:800;color:#1B3A6B;font-size:1rem;margin-bottom:12px;">📊 Puntos a mejorar</div>
+      <div id="mejoras-lista"></div>
     </div>
     <button id="btn-rei" onclick="iniciar()">🔄 Nueva sesión</button>
   </div>
@@ -185,7 +192,7 @@
 </main>
 
 <script>
-const TOTAL = 5;
+const TOTAL = 20;
 const BLOQUES = [
   {id:1,nombre:"Números",afirmaciones:[
     "Reconoce representaciones de números naturales (≥100000) y decimales hasta la diezmilésima",
@@ -226,7 +233,7 @@ const BLOQUES = [
 const CTXS = ['personal','comunitario','ocupacional y productivo','científico'];
 
 let E = {};
-function reset(){ E = {idx:0,intentos:0,corrPrimer:0,conAyuda:0,bloques:new Set(),data:null}; }
+function reset(){ E = {idx:0,intentos:0,corrPrimer:0,conAyuda:0,bloques:new Set(),data:null,historial:[],bloqueActual:''}; }
 
 function show(p){
   document.getElementById('P-inicio').style.display   = p==='inicio'  ?'block':'none';
@@ -246,7 +253,7 @@ function actualizarProg(){
 
 async function generar(){
   const bloque = BLOQUES[E.idx % BLOQUES.length];
-  E.bloques.add(bloque.nombre); E.intentos=0;
+  E.bloques.add(bloque.nombre); E.intentos=0; E.bloqueActual=bloque.nombre;
   document.getElementById('bloque-badge').textContent = `Bloque ${bloque.id}: ${bloque.nombre}`;
   document.getElementById('loader').classList.add('vis');
   document.getElementById('contenido').style.display='none';
@@ -320,9 +327,9 @@ function responder(sel){
   const fb=document.getElementById('feedback');
   if(ok){
     bots.forEach(b=>{const l=b.querySelector('.letra').textContent;if(l===sel)b.classList.add('correcta');else b.setAttribute('disabled','');});
-    if(E.intentos===1){E.corrPrimer++;fb.className='ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}
-    else if(E.intentos===2){fb.className='ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}
-    else{E.conAyuda++;fb.className='warn';fb.textContent='👍 Correcto. Repasá los pasos para afianzar el tema.';}
+    if(E.intentos===1){E.corrPrimer++;E.historial.push({bloque:E.bloqueActual,correctoPrimer:true});fb.className='ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}
+    else if(E.intentos===2){E.historial.push({bloque:E.bloqueActual,correctoPrimer:false});fb.className='ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}
+    else{E.conAyuda++;E.historial.push({bloque:E.bloqueActual,correctoPrimer:false});fb.className='warn';fb.textContent='👍 Correcto. Repasá los pasos para afianzar el tema.';}
     document.getElementById('btn-sig').classList.add('vis');
   } else {
     bots.forEach(b=>{if(b.querySelector('.letra').textContent===sel)b.classList.add('incorrecta');});
@@ -354,14 +361,69 @@ function siguiente(){
 
 function resumen(){
   show('resumen');
-  const pct=Math.round((E.corrPrimer/TOTAL)*100);
-  document.getElementById('trofeo').textContent=pct>=80?'🏆':pct>=60?'⭐':'💪';
-  document.getElementById('res-titulo').textContent=pct>=80?'¡Excelente trabajo!':pct>=60?'¡Buen esfuerzo!':'¡Seguí practicando!';
-  document.getElementById('res-sub').textContent=pct>=80?'Estás muy bien preparado para la prueba.':pct>=60?'Vas por buen camino. Practicá los temas difíciles.':'Cada sesión te hace más fuerte.';
-  document.getElementById('s-cor').textContent=E.corrPrimer;
-  document.getElementById('s-ay').textContent=E.conAyuda;
-  document.getElementById('s-bl').textContent=E.bloques.size;
-  if(pct>=80)confetti();
+  const pct = Math.round((E.corrPrimer/TOTAL)*100);
+
+  // Nota sobre 100
+  let nota, trofeo, titulo, color;
+  if(pct>=90){ nota='Excelente'; trofeo='🏆'; titulo='¡Resultado sobresaliente!'; color='#065F46'; }
+  else if(pct>=80){ nota='Muy bueno'; trofeo='🥇'; titulo='¡Muy buen desempeño!'; color='#065F46'; }
+  else if(pct>=70){ nota='Bueno'; trofeo='🥈'; titulo='¡Buen trabajo!'; color='#1E40AF'; }
+  else if(pct>=60){ nota='Regular'; trofeo='🥉'; titulo='Hay áreas por reforzar'; color='#92400E'; }
+  else{ nota='Necesita refuerzo'; trofeo='💪'; titulo='¡Seguí practicando!'; color='#991B1B'; }
+
+  document.getElementById('trofeo').textContent = trofeo;
+  document.getElementById('res-titulo').textContent = titulo;
+  document.getElementById('s-cor').textContent = E.corrPrimer;
+  document.getElementById('s-ay').textContent  = E.conAyuda;
+  document.getElementById('s-bl').textContent  = E.bloques.size;
+
+  // Nota visual
+  document.getElementById('nota-valor').textContent  = pct + '%';
+  document.getElementById('nota-texto').textContent  = nota;
+  document.getElementById('nota-valor').style.color  = color;
+
+  // Puntos a mejorar por bloque
+  const mejoras = [];
+  const bloquesFallados = {};
+  E.historial.forEach(h => {
+    if(!h.correctoPrimer){
+      if(!bloquesFallados[h.bloque]) bloquesFallados[h.bloque] = { fallados:0, total:0 };
+      bloquesFallados[h.bloque].fallados++;
+    }
+    if(!bloquesFallados[h.bloque]) bloquesFallados[h.bloque] = { fallados:0, total:0 };
+    bloquesFallados[h.bloque].total++;
+  });
+
+  const recomendaciones = {
+    'Números':                    'Practicá operaciones con decimales, fracciones y divisibilidad.',
+    'Geometría':                  'Repasá perímetros, áreas y clasificación de figuras.',
+    'Medidas':                    'Reforzá conversiones del sistema métrico y el sistema monetario.',
+    'Relaciones y Álgebra':       'Trabajá patrones numéricos y ecuaciones con incógnita.',
+    'Estadística y Probabilidad': 'Practicá lectura de gráficos y cálculo de media y moda.'
+  };
+
+  const divMejoras = document.getElementById('mejoras-lista');
+  divMejoras.innerHTML = '';
+
+  let hayMejoras = false;
+  Object.entries(bloquesFallados).forEach(([bloque, datos]) => {
+    const pctBloque = Math.round(((datos.total - datos.fallados) / datos.total) * 100);
+    if(pctBloque < 80){
+      hayMejoras = true;
+      divMejoras.innerHTML += \`
+        <div style="background:#FEF3C7;border-left:4px solid #F59E0B;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-weight:800;color:#92400E;margin-bottom:4px;">📌 \${bloque} — \${pctBloque}% de logro</div>
+          <div style="font-size:.88rem;color:#78350F;">\${recomendaciones[bloque]||'Repasá los contenidos de este bloque.'}</div>
+        </div>\`;
+    }
+  });
+
+  if(!hayMejoras){
+    divMejoras.innerHTML = '<div style="color:#065F46;font-weight:700;text-align:center;padding:12px;">✅ ¡Excelente desempeño en todos los bloques!</div>';
+  }
+
+  document.getElementById('mejoras-seccion').style.display = 'block';
+  if(pct>=80) confetti();
 }
 
 function confetti(){
