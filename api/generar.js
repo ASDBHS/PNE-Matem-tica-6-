@@ -23,44 +23,201 @@ function mezclar(opciones, claveOriginal) {
 }
 
 function crearEjercicioMat() {
-  const tipo = rand(0, 6);
+  var tipo = rand(0, 7);
+
+  // TIPO 0: División con análisis — ¿cuántas cajas completas Y cuánto sobra?
   if (tipo === 0) {
-    const total = rand(200, 999), div = rand(6, 20);
-    const cociente = Math.floor(total / div), resto = total % div;
-    const d1d = cociente + 1;
-    const d2d = cociente - 1 > 0 ? cociente - 1 : cociente + 2;
-    const d3d = Math.floor(total/(div+3)) !== cociente && Math.floor(total/(div+3)) !== d1d && Math.floor(total/(div+3)) !== d2d ? Math.floor(total/(div+3)) : cociente + 3;
-    return { ctx: 'En la Feria del Agricultor de Alajuela, don Marco tiene ' + total + ' naranjas que quiere empacar en bolsas de ' + div + ' unidades cada una.', enunciado: '¿Cuántas bolsas completas puede llenar don Marco?', correcta: cociente + ' bolsas', d: [d1d + ' bolsas', d2d + ' bolsas', d3d + ' bolsas'], pista: 'Dividí ' + total + ' entre ' + div + '. El resultado entero es la cantidad de bolsas completas.', pasos: [{titulo:'Comprender',explicacion:'Tenemos ' + total + ' naranjas y bolsas de ' + div + '.'},{titulo:'Plantear',explicacion:total + ' ÷ ' + div},{titulo:'Resolver',explicacion:total + ' ÷ ' + div + ' = ' + cociente + ' con resto ' + resto + '.'},{titulo:'Verificar',explicacion:cociente + ' × ' + div + ' = ' + (cociente*div) + ' + ' + resto + ' = ' + total + '. ✓'}] };
+    var total = rand(150, 600), div = rand(8, 25);
+    var cociente = Math.floor(total / div), resto = total % div;
+    var necesita = cociente + 1;
+    // Pregunta inversa: ¿cuánto falta para llenar una caja más?
+    var falta = div - resto;
+    var d1 = falta + div, d2 = resto, d3 = div - resto + 1;
+    // Garantizar únicos
+    if (d1 === falta) d1 = falta + div + 1;
+    if (d2 === falta) d2 = resto + 1;
+    if (d3 === falta) d3 = falta + 2;
+    return {
+      ctx: 'La cooperativa de productores de piña de Puntarenas cosechó ' + total + ' piñas. Las cajas de exportación tienen capacidad para ' + div + ' piñas cada una. Las cajas incompletas no se pueden exportar.',
+      enunciado: '¿Cuántas piñas le faltaron a la cooperativa para poder llenar una caja más y aumentar en uno el total de cajas exportadas?',
+      correcta: falta + ' piñas',
+      d: [d1 + ' piñas', d2 + ' piñas', d3 + ' piñas'],
+      pista: 'Primero calculá cuántas cajas completas se llenaron y cuántas piñas sobraron. Luego pensá: ¿cuántas faltarían para completar la siguiente caja?',
+      pasos: [
+        {titulo:'Dividir para encontrar cajas y sobrante', explicacion: total + ' ÷ ' + div + ' = ' + cociente + ' cajas completas, con ' + resto + ' piñas sobrantes.'},
+        {titulo:'Analizar la caja incompleta', explicacion: 'La caja siguiente necesita ' + div + ' piñas pero solo hay ' + resto + '. Le faltan ' + div + ' - ' + resto + ' = ' + falta + ' piñas.'},
+        {titulo:'Resolver', explicacion: 'Faltan ' + falta + ' piñas para completar la caja número ' + necesita + '.'},
+        {titulo:'Verificar', explicacion: resto + ' + ' + falta + ' = ' + div + ', que es exactamente la capacidad de una caja. ✓'}
+      ]
+    };
   }
+
+  // TIPO 1: Porcentaje con decisión — comparar dos opciones
   if (tipo === 1) {
-    const pct = [10,20,25,50][rand(0,3)];
-    const total = pct===25 ? rand(4,20)*4 : pct===50 ? rand(4,20)*2 : rand(5,30)*10;
-    const res = (total * pct) / 100;
-    const d1 = res + pct;
-    const d2 = total - res !== res ? total - res : total - res + 1;
-    const d3 = res + 10 !== res && res + 10 !== d1 && res + 10 !== d2 ? res + 10 : res + 15;
-    return { ctx: 'En la soda escolar del SDBHS se vendieron ' + total + ' refrescos durante la semana.', enunciado: 'Si el ' + pct + '% de los refrescos vendidos eran de cas, ¿cuántos refrescos de cas se vendieron?', correcta: res + ' refrescos', d: [d1 + ' refrescos', d2 + ' refrescos', d3 + ' refrescos'], pista: 'Para calcular el ' + pct + '% de ' + total + ': multiplicá ' + total + ' × ' + pct + ' y dividí entre 100.', pasos: [{titulo:'Comprender',explicacion:'Queremos el ' + pct + '% de ' + total + ' refrescos.'},{titulo:'Plantear',explicacion:total + ' × ' + pct + ' ÷ 100'},{titulo:'Resolver',explicacion:(total*pct) + ' ÷ 100 = ' + res + '.'},{titulo:'Verificar',explicacion:res + ' es el ' + pct + '% de ' + total + '. ✓'}] };
+    var pct = [20, 25, 30][rand(0, 2)];
+    var precioBase = rand(3, 12) * 1000;
+    var descuento = Math.round(precioBase * pct / 100);
+    var precioDes = precioBase - descuento;
+    var precioOtro = precioDes + rand(500, 2000);
+    return {
+      ctx: 'En la Feria del Agricultor de San José, un puesto vende aguacates a ₡' + precioBase.toLocaleString() + ' el kilo y ofrece un descuento del ' + pct + '% por compras mayores a 2 kilos. En el puesto vecino, el mismo aguacate cuesta ₡' + precioOtro.toLocaleString() + ' sin descuento.',
+      enunciado: '¿Cuántos colones ahorra un comprador que adquiere 1 kilo con el descuento del ' + pct + '% en lugar de comprarlo sin descuento en el puesto vecino?',
+      correcta: '₡' + (precioOtro - precioDes).toLocaleString(),
+      d: ['₡' + descuento.toLocaleString(), '₡' + (precioOtro - precioBase).toLocaleString(), '₡' + (precioDes).toLocaleString()],
+      pista: 'Primero calculá el precio con descuento: ₡' + precioBase.toLocaleString() + ' - ' + pct + '% = ¿cuánto? Luego comparalo con ₡' + precioOtro.toLocaleString() + '.',
+      pasos: [
+        {titulo:'Calcular el descuento', explicacion: pct + '% de ₡' + precioBase.toLocaleString() + ' = ₡' + descuento.toLocaleString() + '.'},
+        {titulo:'Precio con descuento', explicacion: '₡' + precioBase.toLocaleString() + ' - ₡' + descuento.toLocaleString() + ' = ₡' + precioDes.toLocaleString() + '.'},
+        {titulo:'Comparar con el otro puesto', explicacion: '₡' + precioOtro.toLocaleString() + ' - ₡' + precioDes.toLocaleString() + ' = ₡' + (precioOtro - precioDes).toLocaleString() + ' de ahorro.'},
+        {titulo:'Verificar', explicacion: 'El puesto con descuento cuesta ₡' + precioDes.toLocaleString() + ' vs ₡' + precioOtro.toLocaleString() + '. Diferencia: ₡' + (precioOtro - precioDes).toLocaleString() + '. ✓'}
+      ]
+    };
   }
+
+  // TIPO 2: Tiempo — problema inverso con análisis
   if (tipo === 2) {
-    const horas = rand(1,8), mins = rand(5,55), totalMin = horas*60+mins;
-    return { ctx: 'El viaje en autobús desde San José hasta Liberia dura ' + horas + ' horas y ' + mins + ' minutos.', enunciado: '¿Cuántos minutos dura el viaje en total?', correcta: totalMin + ' minutos', d: [(horas*60) + ' minutos', (totalMin+10) + ' minutos', (totalMin-5) + ' minutos'], pista: '1 hora = 60 minutos. Convertí las horas y sumá los minutos.', pasos: [{titulo:'Comprender',explicacion:horas + ' horas y ' + mins + ' minutos.'},{titulo:'Plantear',explicacion:horas + ' × 60 + ' + mins},{titulo:'Resolver',explicacion:(horas*60) + ' + ' + mins + ' = ' + totalMin + ' minutos.'},{titulo:'Verificar',explicacion:(horas*60) + ' + ' + mins + ' = ' + totalMin + '. ✓'}] };
+    var horasSalida = rand(5, 9), minsSalida = [0, 15, 30, 45][rand(0, 3)];
+    var durHoras = rand(2, 5), durMins = [0, 20, 30, 40][rand(0, 3)];
+    var llegadaMins = horasSalida * 60 + minsSalida + durHoras * 60 + durMins;
+    var llegadaH = Math.floor(llegadaMins / 60) % 24;
+    var llegadaM = llegadaMins % 60;
+    var fmtSalida = horasSalida + ':' + (minsSalida === 0 ? '00' : minsSalida);
+    var fmtLlegada = llegadaH + ':' + (llegadaM === 0 ? '00' : llegadaM);
+    var totalMin = durHoras * 60 + durMins;
+    var d1 = totalMin + 15, d2 = durHoras * 60, d3 = totalMin - 10;
+    if (d3 <= 0) d3 = totalMin + 5;
+    return {
+      ctx: 'Un autobús de la empresa TRACOPA salió de San José a las ' + fmtSalida + ' con destino a Ciudad Neily, Puntarenas. Por el estado de la carretera, el viaje tardó ' + durHoras + ' horas y ' + durMins + ' minutos, llegando a las ' + fmtLlegada + '.',
+      enunciado: 'Si el viaje de regreso sale de Ciudad Neily a las 2:00 p.m. y dura el mismo tiempo, ¿a qué hora llega a San José?',
+      correcta: (14 + durHoras) % 24 + ':' + (durMins === 0 ? '00' : durMins),
+      d: [(14 + durHoras + 1) % 24 + ':' + (durMins === 0 ? '00' : durMins), (14 + durHoras) % 24 + ':30', (13 + durHoras) % 24 + ':' + (durMins === 0 ? '00' : durMins)],
+      pista: 'El viaje de regreso dura lo mismo: ' + durHoras + ' h y ' + durMins + ' min. Sumá eso a las 2:00 p.m. (14:00 horas).',
+      pasos: [
+        {titulo:'Identificar la duración', explicacion: 'El viaje dura ' + durHoras + ' horas y ' + durMins + ' minutos en ambas direcciones.'},
+        {titulo:'Hora de salida del regreso', explicacion: 'Sale a las 14:00 (2:00 p.m.).'},
+        {titulo:'Sumar la duración', explicacion: '14:00 + ' + durHoras + ' horas = ' + (14 + durHoras) + ':00. Más ' + durMins + ' minutos = ' + (14 + durHoras) + ':' + (durMins === 0 ? '00' : durMins) + '.'},
+        {titulo:'Verificar', explicacion: 'Salida 14:00 + ' + durHoras + 'h ' + durMins + 'min = ' + (14 + durHoras) + ':' + (durMins === 0 ? '00' : durMins) + '. ✓'}
+      ]
+    };
   }
+
+  // TIPO 3: Geometría — área con problema real de dos pasos
   if (tipo === 3) {
-    const base = rand(4,25), altura = rand(3,15), area = base*altura, perim = 2*(base+altura);
-    return { ctx: 'Una familia de Cartago tiene un jardín rectangular que mide ' + base + ' metros de largo y ' + altura + ' metros de ancho.', enunciado: '¿Cuál es el área del jardín?', correcta: area + ' m²', d: [perim + ' m²', (area+base) + ' m²', (area-altura) + ' m²'], pista: 'Área = base × altura = ' + base + ' × ' + altura + '.', pasos: [{titulo:'Comprender',explicacion:'Jardín de ' + base + ' m × ' + altura + ' m.'},{titulo:'Plantear',explicacion:'Área = ' + base + ' × ' + altura},{titulo:'Resolver',explicacion:base + ' × ' + altura + ' = ' + area + ' m²'},{titulo:'Verificar',explicacion:area + ' ÷ ' + base + ' = ' + altura + '. ✓'}] };
+    var largo = rand(8, 30), ancho = rand(5, 20);
+    var area = largo * ancho;
+    var precioM2 = rand(2, 8) * 1000;
+    var costoTotal = area * precioM2;
+    var presupuesto = costoTotal + rand(1, 5) * 10000;
+    var sobra = presupuesto - costoTotal;
+    return {
+      ctx: 'La municipalidad de Cartago quiere reforestar un terreno rectangular de ' + largo + ' m de largo y ' + ancho + ' m de ancho. El costo de plantar árboles es de ₡' + precioM2.toLocaleString() + ' por metro cuadrado. La municipalidad tiene un presupuesto de ₡' + presupuesto.toLocaleString() + '.',
+      enunciado: '¿Cuántos colones le sobrarán a la municipalidad después de reforestar todo el terreno?',
+      correcta: '₡' + sobra.toLocaleString(),
+      d: ['₡' + (sobra + precioM2).toLocaleString(), '₡' + costoTotal.toLocaleString(), '₡' + (sobra - 5000).toLocaleString()],
+      pista: 'Primero calculá el área del terreno. Luego multiplicá por el costo por m². Finalmente restá del presupuesto.',
+      pasos: [
+        {titulo:'Calcular el área', explicacion: largo + ' m × ' + ancho + ' m = ' + area + ' m².'},
+        {titulo:'Calcular el costo total', explicacion: area + ' m² × ₡' + precioM2.toLocaleString() + ' = ₡' + costoTotal.toLocaleString() + '.'},
+        {titulo:'Calcular lo que sobra', explicacion: '₡' + presupuesto.toLocaleString() + ' - ₡' + costoTotal.toLocaleString() + ' = ₡' + sobra.toLocaleString() + '.'},
+        {titulo:'Verificar', explicacion: '₡' + costoTotal.toLocaleString() + ' + ₡' + sobra.toLocaleString() + ' = ₡' + presupuesto.toLocaleString() + '. ✓'}
+      ]
+    };
   }
+
+  // TIPO 4: Patrón numérico con contexto de crecimiento real
   if (tipo === 4) {
-    const inc = rand(3,15), ini = rand(2,20);
-    const seq = [ini, ini+inc, ini+inc*2, ini+inc*3, ini+inc*4];
-    return { ctx: 'La profesora Patricia propone encontrar el patrón de la siguiente sucesión numérica.', enunciado: '¿Cuál es el número que sigue? ' + seq[0] + ', ' + seq[1] + ', ' + seq[2] + ', ' + seq[3] + ', ___', correcta: '' + seq[4], d: ['' + (seq[4]+inc), '' + (seq[4]-1), '' + (seq[3]+inc-1)], pista: 'Calculá la diferencia entre cada par de números. ¿Es siempre la misma?', pasos: [{titulo:'Comprender',explicacion:'Sucesión: ' + seq.slice(0,4).join(', ') + '.'},{titulo:'Identificar patrón',explicacion:'Diferencia constante: ' + inc + '.'},{titulo:'Resolver',explicacion:seq[3] + ' + ' + inc + ' = ' + seq[4] + '.'},{titulo:'Verificar',explicacion:'Sucesión: ' + seq.join(', ') + '. ✓'}] };
+    var inc = rand(4, 20), ini = rand(10, 50);
+    var seq = [ini, ini+inc, ini+inc*2, ini+inc*3, ini+inc*4, ini+inc*5];
+    var semanas = rand(3, 6);
+    var enSemana = seq[semanas - 1];
+    return {
+      ctx: 'Un estudiante del SDBHS lleva un registro de la cantidad de árboles sembrados en el proyecto ambiental del colegio. En la primera semana sembraron ' + seq[0] + ' árboles, en la segunda ' + seq[1] + ', en la tercera ' + seq[2] + ' y en la cuarta ' + seq[3] + '.',
+      enunciado: 'Si el patrón continúa, ¿cuántos árboles habrán sembrado en la semana ' + (semanas + 2) + '?',
+      correcta: seq[semanas + 1] + ' árboles',
+      d: [(seq[semanas + 1] + inc) + ' árboles', (seq[semanas + 1] - 1) + ' árboles', seq[semanas] + ' árboles'],
+      pista: 'Identificá cuánto aumenta la cantidad de árboles cada semana. Ese es el incremento constante del patrón.',
+      pasos: [
+        {titulo:'Identificar el patrón', explicacion: seq[1] + ' - ' + seq[0] + ' = ' + inc + '. El patrón aumenta ' + inc + ' árboles por semana.'},
+        {titulo:'Extender la sucesión', explicacion: 'Semana 5: ' + seq[4] + '. Semana 6: ' + seq[5] + '. Semana 7: ' + (seq[5]+inc) + '.'},
+        {titulo:'Responder', explicacion: 'En la semana ' + (semanas + 2) + ' habrá ' + seq[semanas + 1] + ' árboles.'},
+        {titulo:'Verificar', explicacion: seq[semanas] + ' + ' + inc + ' = ' + seq[semanas + 1] + '. ✓'}
+      ]
+    };
   }
+
+  // TIPO 5: Medidas con conversión + decisión
   if (tipo === 5) {
-    const kg = rand(2,10), g = rand(100,900), totalG = kg*1000+g;
-    return { ctx: 'En el supermercado La Colonia de Heredia, una bolsa de frijoles pesa ' + kg + ' kg y ' + g + ' g.', enunciado: '¿Cuántos gramos pesa la bolsa en total?', correcta: totalG + ' g', d: [(kg*1000) + ' g', (totalG+100) + ' g', (totalG-50) + ' g'], pista: '1 kg = 1000 g. Convertí los kilogramos y sumá.', pasos: [{titulo:'Comprender',explicacion:kg + ' kg y ' + g + ' g.'},{titulo:'Plantear',explicacion:kg + ' × 1000 + ' + g},{titulo:'Resolver',explicacion:(kg*1000) + ' + ' + g + ' = ' + totalG + ' g.'},{titulo:'Verificar',explicacion:(kg*1000) + ' + ' + g + ' = ' + totalG + '. ✓'}] };
+    var kg1 = rand(2, 8), g1 = rand(100, 900);
+    var kg2 = rand(1, 5), g2 = rand(100, 900);
+    var total1G = kg1 * 1000 + g1;
+    var total2G = kg2 * 1000 + g2;
+    var totalG2 = total1G + total2G;
+    var limiteG = rand(8, 14) * 1000;
+    var exceso = totalG2 > limiteG ? totalG2 - limiteG : 0;
+    var cabe = totalG2 <= limiteG;
+    return {
+      ctx: 'En el aeropuerto Juan Santamaría, una familia costarricense lleva dos maletas. La primera pesa ' + kg1 + ' kg y ' + g1 + ' g. La segunda pesa ' + kg2 + ' kg y ' + g2 + ' g. La aerolínea permite un máximo de ' + (limiteG / 1000) + ' kg en total.',
+      enunciado: cabe
+        ? '¿Cuántos gramos le quedan disponibles a la familia antes de alcanzar el límite permitido?'
+        : '¿Cuántos gramos excede el equipaje el límite permitido?',
+      correcta: cabe ? (limiteG - totalG2) + ' g' : exceso + ' g',
+      d: cabe
+        ? [(limiteG - totalG2 + 100) + ' g', (limiteG - totalG2 - 50) + ' g', total2G + ' g']
+        : [(exceso + 100) + ' g', (exceso - 50) + ' g', total2G + ' g'],
+      pista: 'Primero convertí ambas maletas a gramos. Luego sumá los pesos y comparalos con el límite de ' + limiteG + ' g.',
+      pasos: [
+        {titulo:'Convertir maleta 1', explicacion: kg1 + ' kg × 1000 + ' + g1 + ' g = ' + total1G + ' g.'},
+        {titulo:'Convertir maleta 2', explicacion: kg2 + ' kg × 1000 + ' + g2 + ' g = ' + total2G + ' g.'},
+        {titulo:'Sumar y comparar', explicacion: total1G + ' + ' + total2G + ' = ' + totalG2 + ' g. Límite: ' + limiteG + ' g.'},
+        {titulo:'Calcular diferencia', explicacion: cabe ? limiteG + ' - ' + totalG2 + ' = ' + (limiteG - totalG2) + ' g disponibles. ✓' : totalG2 + ' - ' + limiteG + ' = ' + exceso + ' g de exceso. ✓'}
+      ]
+    };
   }
-  const dens = [2,4,5][rand(0,2)], num = rand(1,dens-1), tot = dens*rand(4,12), parte = (tot*num)/dens;
-  return { ctx: 'En el Festival de las Frutas de Quepos, una canasta tiene ' + tot + ' frutas tropicales.', enunciado: 'Si ' + num + '/' + dens + ' de las frutas son piñas, ¿cuántas piñas hay?', correcta: parte + ' piñas', d: [(parte+dens) + ' piñas', (tot-parte) + ' piñas', (parte-num) + ' piñas'], pista: 'Para calcular ' + num + '/' + dens + ' de ' + tot + ': dividí ' + tot + ' entre ' + dens + ' y multiplicá por ' + num + '.', pasos: [{titulo:'Comprender',explicacion:'Queremos ' + num + '/' + dens + ' de ' + tot + ' frutas.'},{titulo:'Plantear',explicacion:tot + ' ÷ ' + dens + ' × ' + num},{titulo:'Resolver',explicacion:(tot/dens) + ' × ' + num + ' = ' + parte + '.'},{titulo:'Verificar',explicacion:parte + ' ÷ ' + tot + ' = ' + num + '/' + dens + '. ✓'}] };
+
+  // TIPO 6: Fracciones con análisis de reparto
+  if (tipo === 6) {
+    var dens = [3, 4, 5][rand(0, 2)];
+    var num1 = rand(1, dens - 1);
+    var num2 = dens - num1;
+    var tot = dens * rand(4, 10);
+    var parte1 = Math.round(tot * num1 / dens);
+    var parte2 = tot - parte1;
+    return {
+      ctx: 'En la clase de 6° grado del SDBHS hay ' + tot + ' estudiantes. ' + num1 + '/' + dens + ' del grupo participó en el proyecto de Ciencias y el resto participó en el proyecto de Matemáticas.',
+      enunciado: '¿Cuántos estudiantes más participaron en el proyecto de ' + (parte1 > parte2 ? 'Ciencias' : 'Matemáticas') + ' que en el otro proyecto?',
+      correcta: Math.abs(parte1 - parte2) + ' estudiantes',
+      d: [parte1 + ' estudiantes', parte2 + ' estudiantes', (Math.abs(parte1 - parte2) + dens) + ' estudiantes'],
+      pista: 'Primero calculá cuántos estudiantes representan ' + num1 + '/' + dens + ' de ' + tot + '. Luego calculá los del otro proyecto y comparalos.',
+      pasos: [
+        {titulo:'Calcular la fracción', explicacion: tot + ' ÷ ' + dens + ' × ' + num1 + ' = ' + parte1 + ' estudiantes en Ciencias.'},
+        {titulo:'Calcular el resto', explicacion: tot + ' - ' + parte1 + ' = ' + parte2 + ' estudiantes en Matemáticas.'},
+        {titulo:'Encontrar la diferencia', explicacion: Math.max(parte1, parte2) + ' - ' + Math.min(parte1, parte2) + ' = ' + Math.abs(parte1 - parte2) + ' estudiantes de diferencia.'},
+        {titulo:'Verificar', explicacion: parte1 + ' + ' + parte2 + ' = ' + tot + ' estudiantes en total. ✓'}
+      ]
+    };
+  }
+
+  // TIPO 7: Ecuación con incógnita en contexto real
+  var precioU = rand(200, 800) * 5;
+  var cantidad = rand(3, 10);
+  var total7 = precioU * cantidad;
+  var extra = rand(1, 4) * 1000;
+  var totalConExtra = total7 + extra;
+  return {
+    ctx: 'Doña Carmen vende chorreadas en el mercado de Heredia. Vendió varias chorreadas a ₡' + precioU.toLocaleString() + ' cada una y además cobró ₡' + extra.toLocaleString() + ' por el empaque. En total cobró ₡' + totalConExtra.toLocaleString() + '.',
+    enunciado: '¿Cuántas chorreadas vendió doña Carmen?',
+    correcta: cantidad + ' chorreadas',
+    d: [(cantidad + 1) + ' chorreadas', (cantidad - 1) + ' chorreadas', (cantidad + 2) + ' chorreadas'],
+    pista: 'Quitá primero el costo del empaque del total. Lo que queda es el precio de las chorreadas. Dividí entre el precio unitario.',
+    pasos: [
+      {titulo:'Quitar el empaque', explicacion: '₡' + totalConExtra.toLocaleString() + ' - ₡' + extra.toLocaleString() + ' = ₡' + total7.toLocaleString() + ' por las chorreadas.'},
+      {titulo:'Plantear la ecuación', explicacion: 'x × ₡' + precioU.toLocaleString() + ' = ₡' + total7.toLocaleString()},
+      {titulo:'Resolver', explicacion: '₡' + total7.toLocaleString() + ' ÷ ₡' + precioU.toLocaleString() + ' = ' + cantidad + ' chorreadas.'},
+      {titulo:'Verificar', explicacion: cantidad + ' × ₡' + precioU.toLocaleString() + ' + ₡' + extra.toLocaleString() + ' = ₡' + totalConExtra.toLocaleString() + '. ✓'}
+    ]
+  };
 }
+
 
 const PROMPTS = {
 
