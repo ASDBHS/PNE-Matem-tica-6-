@@ -1,0 +1,19 @@
+:root {
+  --azul: #1B3A6B; --azul-m: #2563EB; --azul-cl: #DBEAFE;
+  --amarillo: #F59E0B; --verde: #10B981; --rojo: #EF4444;
+  --gris: #F1F5F9; --texto: #1E293B;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: var(--gris); color: var(--texto); padding: 20px; }
+.container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+h1 { color: var(--azul); text-align: center; margin-bottom: 20px; }
+.menu-btn { display: block; width: 100%; padding: 15px; margin: 10px 0; text-align: center; background: var(--azul-m); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; }
+.menu-btn:hover { background: var(--azul); }
+.opcion { padding: 15px; border: 2px solid #E2E8F0; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+.opcion:hover { border-color: var(--azul-m); background: var(--azul-cl); }
+.feedback { margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: bold; }
+.feedback.ok { background: #D1FAE5; color: #065F46; }
+.feedback.err { background: #FEE2E2; color: #991B1B; }
+.btn-accion { display: block; width: 100%; padding: 15px; background: var(--amarillo); color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+.loader { text-align: center; font-size: 1.2rem; color: var(--azul-m); margin: 30px 0; }
+.nav-volver { display: inline-block; margin-bottom: 20px; color: var(--azul-m); text-decoration: none; font-weight: bold; }
