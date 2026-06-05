@@ -79,6 +79,28 @@ const PROMPTS = {
 };
 
 
+function garantizarUnicas(opciones, clave) {
+  var letras = ['A','B','C','D'];
+  var vistos = {};
+  var resultado = {};
+  letras.forEach(function(l) {
+    var val = opciones[l];
+    var intento = 0;
+    while (vistos[val] !== undefined && intento < 10) {
+      var num = parseFloat(val);
+      if (!isNaN(num)) {
+        val = String(num + intento + 1) + val.replace(String(num), '').trim();
+      } else {
+        val = val + ' (' + (intento + 2) + ')';
+      }
+      intento++;
+    }
+    vistos[val] = true;
+    resultado[l] = val;
+  });
+  return resultado;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
