@@ -27,13 +27,19 @@ function crearEjercicioMat() {
   if (tipo === 0) {
     const total = rand(200, 999), div = rand(6, 20);
     const cociente = Math.floor(total / div), resto = total % div;
-    return { ctx: 'En la Feria del Agricultor de Alajuela, don Marco tiene ' + total + ' naranjas que quiere empacar en bolsas de ' + div + ' unidades cada una.', enunciado: '¿Cuántas bolsas completas puede llenar don Marco?', correcta: cociente + ' bolsas', d: [(cociente+1) + ' bolsas', (cociente-1) + ' bolsas', Math.floor(total/(div+3)) + ' bolsas'], pista: 'Dividí ' + total + ' entre ' + div + '. El resultado entero es la cantidad de bolsas completas.', pasos: [{titulo:'Comprender',explicacion:'Tenemos ' + total + ' naranjas y bolsas de ' + div + '.'},{titulo:'Plantear',explicacion:total + ' ÷ ' + div},{titulo:'Resolver',explicacion:total + ' ÷ ' + div + ' = ' + cociente + ' con resto ' + resto + '.'},{titulo:'Verificar',explicacion:cociente + ' × ' + div + ' = ' + (cociente*div) + ' + ' + resto + ' = ' + total + '. ✓'}] };
+    const d1d = cociente + 1;
+    const d2d = cociente - 1 > 0 ? cociente - 1 : cociente + 2;
+    const d3d = Math.floor(total/(div+3)) !== cociente && Math.floor(total/(div+3)) !== d1d && Math.floor(total/(div+3)) !== d2d ? Math.floor(total/(div+3)) : cociente + 3;
+    return { ctx: 'En la Feria del Agricultor de Alajuela, don Marco tiene ' + total + ' naranjas que quiere empacar en bolsas de ' + div + ' unidades cada una.', enunciado: '¿Cuántas bolsas completas puede llenar don Marco?', correcta: cociente + ' bolsas', d: [d1d + ' bolsas', d2d + ' bolsas', d3d + ' bolsas'], pista: 'Dividí ' + total + ' entre ' + div + '. El resultado entero es la cantidad de bolsas completas.', pasos: [{titulo:'Comprender',explicacion:'Tenemos ' + total + ' naranjas y bolsas de ' + div + '.'},{titulo:'Plantear',explicacion:total + ' ÷ ' + div},{titulo:'Resolver',explicacion:total + ' ÷ ' + div + ' = ' + cociente + ' con resto ' + resto + '.'},{titulo:'Verificar',explicacion:cociente + ' × ' + div + ' = ' + (cociente*div) + ' + ' + resto + ' = ' + total + '. ✓'}] };
   }
   if (tipo === 1) {
     const pct = [10,20,25,50][rand(0,3)];
     const total = pct===25 ? rand(4,20)*4 : pct===50 ? rand(4,20)*2 : rand(5,30)*10;
     const res = (total * pct) / 100;
-    return { ctx: 'En la soda escolar del SDBHS se vendieron ' + total + ' refrescos durante la semana.', enunciado: 'Si el ' + pct + '% de los refrescos vendidos eran de cas, ¿cuántos refrescos de cas se vendieron?', correcta: res + ' refrescos', d: [(res+pct) + ' refrescos', (total-res) + ' refrescos', (res+10) + ' refrescos'], pista: 'Para calcular el ' + pct + '% de ' + total + ': multiplicá ' + total + ' × ' + pct + ' y dividí entre 100.', pasos: [{titulo:'Comprender',explicacion:'Queremos el ' + pct + '% de ' + total + ' refrescos.'},{titulo:'Plantear',explicacion:total + ' × ' + pct + ' ÷ 100'},{titulo:'Resolver',explicacion:(total*pct) + ' ÷ 100 = ' + res + '.'},{titulo:'Verificar',explicacion:res + ' es el ' + pct + '% de ' + total + '. ✓'}] };
+    const d1 = res + pct;
+    const d2 = total - res !== res ? total - res : total - res + 1;
+    const d3 = res + 10 !== res && res + 10 !== d1 && res + 10 !== d2 ? res + 10 : res + 15;
+    return { ctx: 'En la soda escolar del SDBHS se vendieron ' + total + ' refrescos durante la semana.', enunciado: 'Si el ' + pct + '% de los refrescos vendidos eran de cas, ¿cuántos refrescos de cas se vendieron?', correcta: res + ' refrescos', d: [d1 + ' refrescos', d2 + ' refrescos', d3 + ' refrescos'], pista: 'Para calcular el ' + pct + '% de ' + total + ': multiplicá ' + total + ' × ' + pct + ' y dividí entre 100.', pasos: [{titulo:'Comprender',explicacion:'Queremos el ' + pct + '% de ' + total + ' refrescos.'},{titulo:'Plantear',explicacion:total + ' × ' + pct + ' ÷ 100'},{titulo:'Resolver',explicacion:(total*pct) + ' ÷ 100 = ' + res + '.'},{titulo:'Verificar',explicacion:res + ' es el ' + pct + '% de ' + total + '. ✓'}] };
   }
   if (tipo === 2) {
     const horas = rand(1,8), mins = rand(5,55), totalMin = horas*60+mins;
@@ -62,6 +68,31 @@ const PROMPTS = {
   cien: function(b,a){ return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada Sumativa de Ciencias 2026, 6° grado primaria.\nBLOQUE: ' + b + '\nAFIRMACIÓN: ' + a + '\nREGLAS CRÍTICAS:\n1. El contexto_situacional DEBE describir directamente una situación relacionada con el concepto evaluado en la afirmación — NO usés un contexto genérico de naturaleza que no tenga relación con la pregunta.\n2. La pregunta DEBE poder responderse USANDO la información del contexto — evalúa comprensión aplicada, no memorización.\n3. Si la afirmación trata del cuerpo humano, el contexto debe mostrar una situación concreta del cuerpo humano (síntomas, experimentos, datos biológicos). Si trata de energía, el contexto debe mostrar una situación de energía. NO mezcles temas.\n4. 4 opciones: una clave correcta verificada, tres distractores que representen errores conceptuales típicos de 6° grado.\n5. Podés usar contextos costarricenses cuando sea natural y coherente con el tema.\nRespondé SOLO con JSON: {"contexto_situacional":"situación directamente relacionada con el concepto evaluado","enunciado":"pregunta que requiere analizar el contexto","opciones":{"A":"...","B":"...","C":"...","D":"..."},"clave":"A","pista":"...","pasos_resolucion":[{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."}]}'; }
 };
 
+// Garantiza que las 4 opciones sean siempre únicas
+function garantizarUnicas(opciones, clave) {
+  const letras = ['A','B','C','D'];
+  const valores = letras.map(function(l){ return opciones[l]; });
+  const vistos = {};
+  const resultado = {};
+  letras.forEach(function(l, i) {
+    let val = valores[i];
+    let intento = 0;
+    while (vistos[val] && intento < 10) {
+      // Si es número, sumar un offset
+      const num = parseFloat(val);
+      if (!isNaN(num)) {
+        val = (num + intento + 1) + val.replace(/[\d.]+/, '').trim();
+      } else {
+        val = val + ' (opción ' + (intento+1) + ')';
+      }
+      intento++;
+    }
+    vistos[val] = true;
+    resultado[l] = val;
+  });
+  return resultado;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -81,7 +112,9 @@ module.exports = async function handler(req, res) {
   try {
     if (materia === 'mat') {
       const ej = crearEjercicioMat();
-      const mixed = mezclar({ A: ej.correcta, B: ej.d[0], C: ej.d[1], D: ej.d[2] }, 'A');
+      const rawOps = { A: ej.correcta, B: ej.d[0], C: ej.d[1], D: ej.d[2] };
+      const uniqueOps = garantizarUnicas(rawOps, 'A');
+      const mixed = mezclar(uniqueOps, 'A');
       return res.status(200).json({
         contexto_situacional: ej.ctx,
         enunciado: ej.enunciado,
