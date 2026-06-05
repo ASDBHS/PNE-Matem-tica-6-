@@ -1,20 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TutoríaPRO - Inicio</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TutoríaPRO · 6° Grado · SDBHS</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1 class="index-titulo">📚 TutoríaPRO</h1>
-    <p class="index-sub">Práctica adaptativa DGEC 2026 · MEP Costa Rica<br>Selecciona la materia que deseas practicar hoy:</p>
 
-    <a href="matematicas.html" class="menu-btn" style="background:#7C3AED;">📐 Matemáticas</a>
-    <a href="ciencias.html"    class="menu-btn" style="background:#10B981;">🔬 Ciencias</a>
-    <a href="espanol.html"     class="menu-btn" style="background:#F59E0B;">📖 Español</a>
-    <a href="sociales.html"    class="menu-btn" style="background:#1B3A6B;">🌍 Estudios Sociales</a>
+<header>
+  <span class="logo">📚</span>
+  <div class="info">
+    <h1>TutoríaPRO</h1>
+    <p>Práctica adaptativa · 6° Grado · SDBHS</p>
   </div>
+  <span class="badge">DGEC 2026</span>
+</header>
+
+<main>
+  <div class="card">
+    <div class="dashboard-hero">
+      <span class="hero-icon">🎯</span>
+      <h2>¿Qué materia querés practicar hoy?</h2>
+      <p>Ejercicios generados por IA, alineados al Marco de Especificaciones DGEC 2026. Cada sesión es completamente diferente — practicá cuantas veces quieras.</p>
+    </div>
+
+    <div class="materias-grid">
+      <a href="matematicas.html" class="materia-card mc-mat">
+        <span class="mc-icon">🧮</span>
+        <h3>Matemáticas</h3>
+        <p>Números, Geometría, Medidas, Álgebra y Estadística</p>
+      </a>
+      <a href="espanol.html" class="materia-card mc-esp">
+        <span class="mc-icon">📖</span>
+        <h3>Español</h3>
+        <p>Comprensión lectora, textos literarios y no literarios</p>
+      </a>
+      <a href="ciencias.html" class="materia-card mc-cien">
+        <span class="mc-icon">🔬</span>
+        <h3>Ciencias</h3>
+        <p>Cuerpo humano, Biodiversidad, Energía y Geofísica</p>
+      </a>
+      <a href="sociales.html" class="materia-card mc-ss">
+        <span class="mc-icon">🌍</span>
+        <h3>Estudios Sociales</h3>
+        <p>Geografía, Historia y Ciudadanía costarricense</p>
+      </a>
+    </div>
+  </div>
+</main>
+
 </body>
 </html>
