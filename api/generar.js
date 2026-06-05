@@ -1,8 +1,5 @@
-// ══════════════════════════════════════════════════════════
-//  GENERADOR UNIFICADO — 4 Materias · SDBHS · DGEC 2026
-//  Matemáticas: plantillas exactas + IA para contexto
-//  Español, Ciencias, Estudios Sociales: IA completa
-// ══════════════════════════════════════════════════════════
+// TutoríaPRO — Vercel Serverless Function
+// 4 materias: mat, esp, cien, ss
 
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -11,153 +8,145 @@ function rand(min, max) {
 function mezclar(opciones, claveOriginal) {
   const letras = ['A','B','C','D'];
   const textos = letras.map(l => opciones[l]);
-  for(let i=textos.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[textos[i],textos[j]]=[textos[j],textos[i]];}
+  for (let i = textos.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = textos[i]; textos[i] = textos[j]; textos[j] = tmp;
+  }
   const textoCorrecta = opciones[claveOriginal];
-  const nuevas={};let nuevaClave='';
-  letras.forEach((l,i)=>{nuevas[l]=textos[i];if(textos[i]===textoCorrecta)nuevaClave=l;});
-  return {opciones:nuevas,clave:nuevaClave};
+  const nuevas = {};
+  let nuevaClave = '';
+  letras.forEach(function(l, i) {
+    nuevas[l] = textos[i];
+    if (textos[i] === textoCorrecta) nuevaClave = l;
+  });
+  return { opciones: nuevas, clave: nuevaClave };
 }
 
-// ── PLANTILLAS MATEMÁTICAS (siempre correctas) ────────────
 function crearEjercicioMat() {
-  const tipo = rand(0,6);
-  if(tipo===0){
-    const total=rand(200,999),div=rand(6,20),cociente=Math.floor(total/div),resto=total%div;
-    return {ctx:`En una escuela de Costa Rica se tienen ${total} lápices que deben repartirse en cajas de ${div} unidades cada una.`,enunciado:`¿Cuántas cajas completas se pueden llenar?`,correcta:`${cociente} cajas`,d:[`${cociente+1} cajas`,`${cociente-1} cajas`,`${Math.floor(total/(div+2))} cajas`],pista:`Dividí ${total} entre ${div}. Solo contamos las cajas completas, no el sobrante.`,pasos:[{titulo:'Comprender',explicacion:`${total} lápices en cajas de ${div}.`},{titulo:'Plantear',explicacion:`${total} ÷ ${div}`},{titulo:'Resolver',explicacion:`${total} ÷ ${div} = ${cociente} con resto ${resto}.`},{titulo:'Verificar',explicacion:`${cociente} × ${div} = ${cociente*div} + ${resto} = ${total}. ✓`}]};
+  const tipo = rand(0, 6);
+  if (tipo === 0) {
+    const total = rand(200, 999), div = rand(6, 20);
+    const cociente = Math.floor(total / div), resto = total % div;
+    return { ctx: 'En la Feria del Agricultor de Alajuela, don Marco tiene ' + total + ' naranjas que quiere empacar en bolsas de ' + div + ' unidades cada una.', enunciado: '¿Cuántas bolsas completas puede llenar don Marco?', correcta: cociente + ' bolsas', d: [(cociente+1) + ' bolsas', (cociente-1) + ' bolsas', Math.floor(total/(div+3)) + ' bolsas'], pista: 'Dividí ' + total + ' entre ' + div + '. El resultado entero es la cantidad de bolsas completas.', pasos: [{titulo:'Comprender',explicacion:'Tenemos ' + total + ' naranjas y bolsas de ' + div + '.'},{titulo:'Plantear',explicacion:total + ' ÷ ' + div},{titulo:'Resolver',explicacion:total + ' ÷ ' + div + ' = ' + cociente + ' con resto ' + resto + '.'},{titulo:'Verificar',explicacion:cociente + ' × ' + div + ' = ' + (cociente*div) + ' + ' + resto + ' = ' + total + '. ✓'}] };
   }
-  if(tipo===1){
-    const pct=[10,20,25,50][rand(0,3)];const total=pct===25?rand(2,20)*4:pct===50?rand(2,20)*2:rand(5,30)*10;const resultado=(total*pct)/100;
-    return {ctx:`En un mercado de San José hay ${total} frutas en exhibición.`,enunciado:`Si el ${pct}% de las frutas son mangos, ¿cuántos mangos hay?`,correcta:`${resultado} mangos`,d:[`${resultado+pct} mangos`,`${total-resultado} mangos`,`${resultado+10} mangos`],pista:`${pct}% de ${total}: multiplicá ${total} × ${pct} y dividí entre 100.`,pasos:[{titulo:'Comprender',explicacion:`${pct}% de ${total}.`},{titulo:'Plantear',explicacion:`${total} × ${pct} ÷ 100`},{titulo:'Resolver',explicacion:`${total*pct} ÷ 100 = ${resultado}.`},{titulo:'Verificar',explicacion:`${resultado} es el ${pct}% de ${total}. ✓`}]};
+  if (tipo === 1) {
+    const pct = [10,20,25,50][rand(0,3)];
+    const total = pct===25 ? rand(4,20)*4 : pct===50 ? rand(4,20)*2 : rand(5,30)*10;
+    const res = (total * pct) / 100;
+    return { ctx: 'En la soda escolar del SDBHS se vendieron ' + total + ' refrescos durante la semana.', enunciado: 'Si el ' + pct + '% de los refrescos vendidos eran de cas, ¿cuántos refrescos de cas se vendieron?', correcta: res + ' refrescos', d: [(res+pct) + ' refrescos', (total-res) + ' refrescos', (res+10) + ' refrescos'], pista: 'Para calcular el ' + pct + '% de ' + total + ': multiplicá ' + total + ' × ' + pct + ' y dividí entre 100.', pasos: [{titulo:'Comprender',explicacion:'Queremos el ' + pct + '% de ' + total + ' refrescos.'},{titulo:'Plantear',explicacion:total + ' × ' + pct + ' ÷ 100'},{titulo:'Resolver',explicacion:(total*pct) + ' ÷ 100 = ' + res + '.'},{titulo:'Verificar',explicacion:res + ' es el ' + pct + '% de ' + total + '. ✓'}] };
   }
-  if(tipo===2){
-    const horas=rand(2,8),mins=rand(5,55),totalMin=horas*60+mins;
-    return {ctx:`Una excursión escolar desde Alajuela hasta el Volcán Poás dura ${horas} horas y ${mins} minutos.`,enunciado:`¿Cuántos minutos dura la excursión en total?`,correcta:`${totalMin} minutos`,d:[`${horas*60} minutos`,`${totalMin+10} minutos`,`${totalMin-5} minutos`],pista:`1 hora = 60 minutos. Convertí las horas y sumá.`,pasos:[{titulo:'Comprender',explicacion:`${horas} horas y ${mins} minutos.`},{titulo:'Plantear',explicacion:`${horas} × 60 + ${mins}`},{titulo:'Resolver',explicacion:`${horas*60} + ${mins} = ${totalMin} min.`},{titulo:'Verificar',explicacion:`${horas*60} + ${mins} = ${totalMin}. ✓`}]};
+  if (tipo === 2) {
+    const horas = rand(1,8), mins = rand(5,55), totalMin = horas*60+mins;
+    return { ctx: 'El viaje en autobús desde San José hasta Liberia dura ' + horas + ' horas y ' + mins + ' minutos.', enunciado: '¿Cuántos minutos dura el viaje en total?', correcta: totalMin + ' minutos', d: [(horas*60) + ' minutos', (totalMin+10) + ' minutos', (totalMin-5) + ' minutos'], pista: '1 hora = 60 minutos. Convertí las horas y sumá los minutos.', pasos: [{titulo:'Comprender',explicacion:horas + ' horas y ' + mins + ' minutos.'},{titulo:'Plantear',explicacion:horas + ' × 60 + ' + mins},{titulo:'Resolver',explicacion:(horas*60) + ' + ' + mins + ' = ' + totalMin + ' minutos.'},{titulo:'Verificar',explicacion:(horas*60) + ' + ' + mins + ' = ' + totalMin + '. ✓'}] };
   }
-  if(tipo===3){
-    const base=rand(5,25),altura=rand(3,15),area=base*altura,perim=2*(base+altura);
-    return {ctx:`Un agricultor de Cartago tiene un terreno rectangular de ${base} m de largo y ${altura} m de ancho.`,enunciado:`¿Cuál es el área del terreno?`,correcta:`${area} m²`,d:[`${perim} m²`,`${area+base} m²`,`${area-altura} m²`],pista:`Área = base × altura.`,pasos:[{titulo:'Comprender',explicacion:`${base} m × ${altura} m.`},{titulo:'Plantear',explicacion:`${base} × ${altura}`},{titulo:'Resolver',explicacion:`${base} × ${altura} = ${area} m²`},{titulo:'Verificar',explicacion:`${area} ÷ ${base} = ${altura}. ✓`}]};
+  if (tipo === 3) {
+    const base = rand(4,25), altura = rand(3,15), area = base*altura, perim = 2*(base+altura);
+    return { ctx: 'Una familia de Cartago tiene un jardín rectangular que mide ' + base + ' metros de largo y ' + altura + ' metros de ancho.', enunciado: '¿Cuál es el área del jardín?', correcta: area + ' m²', d: [perim + ' m²', (area+base) + ' m²', (area-altura) + ' m²'], pista: 'Área = base × altura = ' + base + ' × ' + altura + '.', pasos: [{titulo:'Comprender',explicacion:'Jardín de ' + base + ' m × ' + altura + ' m.'},{titulo:'Plantear',explicacion:'Área = ' + base + ' × ' + altura},{titulo:'Resolver',explicacion:base + ' × ' + altura + ' = ' + area + ' m²'},{titulo:'Verificar',explicacion:area + ' ÷ ' + base + ' = ' + altura + '. ✓'}] };
   }
-  if(tipo===4){
-    const inc=rand(3,15),ini=rand(2,20),seq=[0,1,2,3,4].map(i=>ini+inc*i);
-    return {ctx:`Una estudiante de 6° grado observa el siguiente patrón numérico.`,enunciado:`Completá la sucesión: ${seq[0]}, ${seq[1]}, ${seq[2]}, ${seq[3]}, ___`,correcta:`${seq[4]}`,d:[`${seq[4]+inc}`,`${seq[4]-1}`,`${seq[3]+inc-1}`],pista:`Calculá la diferencia entre cada par. ¿Es constante?`,pasos:[{titulo:'Comprender',explicacion:`${seq[0]}, ${seq[1]}, ${seq[2]}, ${seq[3]}.`},{titulo:'Identificar patrón',explicacion:`Diferencia constante: ${inc}.`},{titulo:'Resolver',explicacion:`${seq[3]} + ${inc} = ${seq[4]}.`},{titulo:'Verificar',explicacion:`Sucesión: ${seq.join(', ')}. ✓`}]};
+  if (tipo === 4) {
+    const inc = rand(3,15), ini = rand(2,20);
+    const seq = [ini, ini+inc, ini+inc*2, ini+inc*3, ini+inc*4];
+    return { ctx: 'La profesora Patricia propone encontrar el patrón de la siguiente sucesión numérica.', enunciado: '¿Cuál es el número que sigue? ' + seq[0] + ', ' + seq[1] + ', ' + seq[2] + ', ' + seq[3] + ', ___', correcta: '' + seq[4], d: ['' + (seq[4]+inc), '' + (seq[4]-1), '' + (seq[3]+inc-1)], pista: 'Calculá la diferencia entre cada par de números. ¿Es siempre la misma?', pasos: [{titulo:'Comprender',explicacion:'Sucesión: ' + seq.slice(0,4).join(', ') + '.'},{titulo:'Identificar patrón',explicacion:'Diferencia constante: ' + inc + '.'},{titulo:'Resolver',explicacion:seq[3] + ' + ' + inc + ' = ' + seq[4] + '.'},{titulo:'Verificar',explicacion:'Sucesión: ' + seq.join(', ') + '. ✓'}] };
   }
-  if(tipo===5){
-    const kg=rand(2,10),g=rand(100,900),totalG=kg*1000+g;
-    return {ctx:`En una pulpería de Heredia se vende una bolsa con ${kg} kg y ${g} g de arroz.`,enunciado:`¿Cuántos gramos pesa la bolsa en total?`,correcta:`${totalG} g`,d:[`${kg*1000} g`,`${totalG+100} g`,`${totalG-50} g`],pista:`1 kg = 1000 g. Convertí y sumá.`,pasos:[{titulo:'Comprender',explicacion:`${kg} kg y ${g} g.`},{titulo:'Plantear',explicacion:`${kg} × 1000 + ${g}`},{titulo:'Resolver',explicacion:`${kg*1000} + ${g} = ${totalG} g.`},{titulo:'Verificar',explicacion:`${kg*1000} + ${g} = ${totalG}. ✓`}]};
+  if (tipo === 5) {
+    const kg = rand(2,10), g = rand(100,900), totalG = kg*1000+g;
+    return { ctx: 'En el supermercado La Colonia de Heredia, una bolsa de frijoles pesa ' + kg + ' kg y ' + g + ' g.', enunciado: '¿Cuántos gramos pesa la bolsa en total?', correcta: totalG + ' g', d: [(kg*1000) + ' g', (totalG+100) + ' g', (totalG-50) + ' g'], pista: '1 kg = 1000 g. Convertí los kilogramos y sumá.', pasos: [{titulo:'Comprender',explicacion:kg + ' kg y ' + g + ' g.'},{titulo:'Plantear',explicacion:kg + ' × 1000 + ' + g},{titulo:'Resolver',explicacion:(kg*1000) + ' + ' + g + ' = ' + totalG + ' g.'},{titulo:'Verificar',explicacion:(kg*1000) + ' + ' + g + ' = ' + totalG + '. ✓'}] };
   }
-  const dens=[2,4,5][rand(0,2)],num=rand(1,dens-1),tot=dens*rand(4,12),parte=(tot*num)/dens;
-  return {ctx:`En una canasta del mercado de Limón hay ${tot} frutas de diferentes tipos.`,enunciado:`Si ${num}/${dens} de las frutas son piñas, ¿cuántas piñas hay?`,correcta:`${parte} piñas`,d:[`${parte+dens} piñas`,`${tot-parte} piñas`,`${parte-num} piñas`],pista:`${num}/${dens} de ${tot}: dividí entre ${dens} y multiplicá por ${num}.`,pasos:[{titulo:'Comprender',explicacion:`${num}/${dens} de ${tot}.`},{titulo:'Plantear',explicacion:`${tot} ÷ ${dens} × ${num}`},{titulo:'Resolver',explicacion:`${tot/dens} × ${num} = ${parte}.`},{titulo:'Verificar',explicacion:`${parte}/${tot} = ${num}/${dens}. ✓`}]};
+  const dens = [2,4,5][rand(0,2)], num = rand(1,dens-1), tot = dens*rand(4,12), parte = (tot*num)/dens;
+  return { ctx: 'En el Festival de las Frutas de Quepos, una canasta tiene ' + tot + ' frutas tropicales.', enunciado: 'Si ' + num + '/' + dens + ' de las frutas son piñas, ¿cuántas piñas hay?', correcta: parte + ' piñas', d: [(parte+dens) + ' piñas', (tot-parte) + ' piñas', (parte-num) + ' piñas'], pista: 'Para calcular ' + num + '/' + dens + ' de ' + tot + ': dividí ' + tot + ' entre ' + dens + ' y multiplicá por ' + num + '.', pasos: [{titulo:'Comprender',explicacion:'Queremos ' + num + '/' + dens + ' de ' + tot + ' frutas.'},{titulo:'Plantear',explicacion:tot + ' ÷ ' + dens + ' × ' + num},{titulo:'Resolver',explicacion:(tot/dens) + ' × ' + num + ' = ' + parte + '.'},{titulo:'Verificar',explicacion:parte + ' ÷ ' + tot + ' = ' + num + '/' + dens + '. ✓'}] };
 }
 
-// ── PROMPTS POR MATERIA ───────────────────────────────────
 const PROMPTS = {
-  ss: (bloque, af) => `Eres un generador experto de ítems de selección única para la Prueba Nacional Estandarizada Diagnóstica de Estudios Sociales 2026 de Costa Rica (DGEC), 6° grado primaria.
-
-BLOQUE: ${bloque}
-AFIRMACIÓN: ${af}
-
-REGLAS:
-- Contexto real costarricense o situación histórica concreta.
-- 4 opciones: una correcta, tres distractores plausibles que representen errores de comprensión típicos.
-- Dificultad intermedia: el estudiante debe analizar, comparar o inferir, no solo recordar.
-- Variá el tipo: identificación, comparación, causa-efecto, inferencia o aplicación.
-- VERIFICÁ que la clave sea correcta antes de responder.
-
-Respondé SOLO con JSON:
-{"contexto_situacional":"situación breve o vacío","enunciado":"la pregunta completa","opciones":{"A":"...","B":"...","C":"...","D":"..."},"clave":"letra","pista":"orientación sin revelar la respuesta","pasos_resolucion":[{"titulo":"Identificar el tema","explicacion":"..."},{"titulo":"Analizar la pregunta","explicacion":"..."},{"titulo":"Determinar la respuesta","explicacion":"..."},{"titulo":"Verificar","explicacion":"..."}]}`,
-
-  esp: (bloque, af) => `Eres un generador experto de ítems de selección única para la Prueba Nacional Estandarizada Sumativa de Español (Comprensión Lectora) 2026 de Costa Rica (DGEC), 6° grado primaria.
-
-AFIRMACIÓN: ${af}
-
-REGLAS IMPORTANTES:
-- Creá un texto breve (3-6 oraciones) como contexto: puede ser un párrafo informativo (no literario) o un fragmento narrativo (literario).
-- La pregunta debe basarse en el texto del contexto — el estudiante no puede responder sin leerlo.
-- Evaluá comprensión profunda: ideas principales, causa-efecto, inferencias, pensamientos de personajes o conflictos.
-- NO evalúes memorización de definiciones.
-- 4 opciones: una correcta, tres distractores plausibles basados en errores de comprensión.
-- Dificultad intermedia-avanzada.
-
-Respondé SOLO con JSON:
-{"contexto_situacional":"el texto que el estudiante debe leer (3-6 oraciones)","enunciado":"la pregunta sobre el texto","opciones":{"A":"...","B":"...","C":"...","D":"..."},"clave":"letra","pista":"orientación para analizar el texto sin revelar la respuesta","pasos_resolucion":[{"titulo":"Leer el texto","explicacion":"..."},{"titulo":"Identificar lo que pregunta","explicacion":"..."},{"titulo":"Analizar las opciones","explicacion":"..."},{"titulo":"Verificar","explicacion":"..."}]}`,
-
-  cien: (bloque, af) => `Eres un generador experto de ítems de selección única para la Prueba Nacional Estandarizada Sumativa de Ciencias 2026 de Costa Rica (DGEC), 6° grado primaria.
-
-BLOQUE: ${bloque}
-AFIRMACIÓN: ${af}
-
-REGLAS:
-- Presentá una situación, dato científico, imagen descrita o fenómeno natural como contexto.
-- La pregunta debe requerir comprensión o aplicación, no solo memorización.
-- 4 opciones: una correcta, tres distractores que representen errores conceptuales comunes.
-- Dificultad intermedia.
-- Usá contextos de Costa Rica cuando sea posible (parques nacionales, volcanes, biodiversidad costarricense).
-
-Respondé SOLO con JSON:
-{"contexto_situacional":"situación o dato científico (2-3 oraciones)","enunciado":"la pregunta","opciones":{"A":"...","B":"...","C":"...","D":"..."},"clave":"letra","pista":"orientación conceptual sin revelar la respuesta","pasos_resolucion":[{"titulo":"Comprender la situación","explicacion":"..."},{"titulo":"Identificar el concepto clave","explicacion":"..."},{"titulo":"Analizar las opciones","explicacion":"..."},{"titulo":"Verificar","explicacion":"..."}]}`
+  ss:   function(b,a){ return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada Diagnóstica de Estudios Sociales 2026, 6° grado primaria.\nBLOQUE: ' + b + '\nAFIRMACIÓN: ' + a + '\nREGLAS: Usá un contexto histórico, geográfico o ciudadano de Costa Rica. Evaluá análisis e inferencia, no memorización. 4 opciones con una clave correcta verificada y tres distractores plausibles.\nRespondé SOLO con JSON: {"contexto_situacional":"...","enunciado":"...","opciones":{"A":"...","B":"...","C":"...","D":"..."},"clave":"A","pista":"...","pasos_resolucion":[{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."}]}'; },
+  esp:  function(b,a){ return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de comprensión lectora para la Prueba Nacional Estandarizada Sumativa de Español 2026, 6° grado primaria.\nAFIRMACIÓN: ' + a + '\nREGLAS CRÍTICAS: El campo contexto_situacional DEBE contener un texto original de 4 a 6 oraciones para que el estudiante lea. La pregunta NO puede responderse sin leer el texto. Evaluá inferencia, idea principal o causa-efecto. 4 opciones con una clave correcta y tres distractores plausibles.\nRespondé SOLO con JSON: {"contexto_situacional":"texto de 4-6 oraciones","enunciado":"pregunta sobre el texto","opciones":{"A":"...","B":"...","C":"...","D":"..."},"clave":"A","pista":"...","pasos_resolucion":[{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."}]}'; },
+  cien: function(b,a){ return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada Sumativa de Ciencias 2026, 6° grado primaria.\nBLOQUE: ' + b + '\nAFIRMACIÓN: ' + a + '\nREGLAS: Usá un contexto de la naturaleza o biodiversidad de Costa Rica. Evaluá comprensión y aplicación de conceptos científicos. 4 opciones con una clave correcta y tres distractores que representen errores conceptuales comunes.\nRespondé SOLO con JSON: {"contexto_situacional":"...","enunciado":"...","opciones":{"A":"...","B":"...","C":"...","D":"..."},"clave":"A","pista":"...","pasos_resolucion":[{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."}]}'; }
 };
 
-// ── GENERAR VÍA IA (Estudios Sociales, Español, Ciencias) ──
-async function crearEjercicioIA(materia, bloque, afirmacion) {
-  const prompt = PROMPTS[materia](bloque, afirmacion);
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':`Bearer ${process.env.GROQ_API_KEY}`},
-    body: JSON.stringify({
-      model:'llama-3.3-70b-versatile',
-      max_tokens:1500,
-      temperature:0.85,
-      response_format:{type:'json_object'},
-      messages:[{role:'user',content:prompt}]
-    })
-  });
-  const datos = await res.json();
-  if(datos.error) throw new Error(datos.error.message);
-  const texto = datos.choices?.[0]?.message?.content||'';
-  const ini=texto.indexOf('{'),fin=texto.lastIndexOf('}');
-  if(ini===-1||fin===-1) throw new Error('Sin JSON válido');
-  return JSON.parse(texto.substring(ini,fin+1));
-}
-
-// ── HANDLER PRINCIPAL ─────────────────────────────────────
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin','*');
-  res.setHeader('Access-Control-Allow-Methods','POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers','Content-Type');
-  if(req.method==='OPTIONS') return res.status(200).end();
-  if(req.method!=='POST') return res.status(405).json({error:'Método no permitido'});
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  const {materia, bloque, afirmacion} = req.body;
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método no permitido' });
+  }
+
+  const materia   = req.body && req.body.materia   ? req.body.materia   : 'mat';
+  const bloque    = req.body && req.body.bloque     ? req.body.bloque    : '';
+  const afirmacion = req.body && req.body.afirmacion ? req.body.afirmacion : '';
 
   try {
-    if(materia === 'mat') {
-      // Matemáticas: plantilla exacta + enriquecimiento IA opcional
+    if (materia === 'mat') {
       const ej = crearEjercicioMat();
-      let contexto = ej.ctx;
-      try {
-        const gr = await fetch('https://api.groq.com/openai/v1/chat/completions',{
-          method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${process.env.GROQ_API_KEY}`},
-          body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:100,temperature:0.8,
-            messages:[{role:'user',content:`Reescribí este contexto con más detalle costarricense (máximo 2 oraciones, sin cambiar números): "${ej.ctx}". Respondé SOLO con el texto.`}]})
-        });
-        const gd=await gr.json();
-        const t=gd.choices?.[0]?.message?.content?.trim();
-        if(t&&t.length>10) contexto=t;
-      } catch(e){}
-      const {opciones,clave}=mezclar({A:ej.correcta,B:ej.d[0],C:ej.d[1],D:ej.d[2]},'A');
-      return res.status(200).json({contexto_situacional:contexto,enunciado:ej.enunciado,opciones,clave,pista:ej.pista,pasos_resolucion:ej.pasos});
-
-    } else {
-      // SS, Español, Ciencias: generado por IA
-      const ejercicio = await crearEjercicioIA(materia, bloque, afirmacion);
-      if(!ejercicio.enunciado||!ejercicio.opciones||!ejercicio.clave) throw new Error('Respuesta incompleta de la IA');
-      const {opciones,clave}=mezclar(ejercicio.opciones,ejercicio.clave);
-      ejercicio.opciones=opciones; ejercicio.clave=clave;
-      return res.status(200).json(ejercicio);
+      const mixed = mezclar({ A: ej.correcta, B: ej.d[0], C: ej.d[1], D: ej.d[2] }, 'A');
+      return res.status(200).json({
+        contexto_situacional: ej.ctx,
+        enunciado: ej.enunciado,
+        opciones: mixed.opciones,
+        clave: mixed.clave,
+        pista: ej.pista,
+        pasos_resolucion: ej.pasos
+      });
     }
 
-  } catch(err) {
-    console.error(err);
-    return res.status(500).json({error:err.message});
+    const promptFn = PROMPTS[materia];
+    if (!promptFn) {
+      return res.status(400).json({ error: 'Materia no reconocida: ' + materia });
+    }
+
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'GROQ_API_KEY no configurada' });
+    }
+
+    const prompt = promptFn(bloque, afirmacion);
+
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1500,
+        temperature: 0.85,
+        response_format: { type: 'json_object' },
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const datos = await groqRes.json();
+
+    if (datos.error) {
+      return res.status(500).json({ error: datos.error.message });
+    }
+
+    const texto = datos.choices && datos.choices[0] && datos.choices[0].message
+      ? datos.choices[0].message.content || ''
+      : '';
+
+    const ini = texto.indexOf('{');
+    const fin = texto.lastIndexOf('}');
+    if (ini === -1 || fin === -1) {
+      return res.status(500).json({ error: 'Sin JSON válido en respuesta' });
+    }
+
+    const ejercicio = JSON.parse(texto.substring(ini, fin + 1));
+    if (!ejercicio.enunciado || !ejercicio.opciones || !ejercicio.clave) {
+      return res.status(500).json({ error: 'JSON incompleto' });
+    }
+
+    const mixed = mezclar(ejercicio.opciones, ejercicio.clave);
+    ejercicio.opciones = mixed.opciones;
+    ejercicio.clave    = mixed.clave;
+
+    return res.status(200).json(ejercicio);
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Error interno' });
   }
 };
