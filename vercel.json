@@ -1,8 +1,13 @@
 
 {
-  "functions": {
-    "api/generar.js": {
-      "runtime": "nodejs20.x"
+  "routes": [
+    {
+      "src": "/api/generar",
+      "dest": "/api/generar.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
     }
-  }
+  ]
 }
