@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 // ══════════════════════════════════════════════════════════
 //  GENERADOR DE EJERCICIOS MATEMÁTICAMENTE CORRECTOS
 //  El servidor genera los números y calcula la respuesta.
