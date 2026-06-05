@@ -1,83 +1,120 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Práctica Estudios Sociales</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudios Sociales · TutoríaPRO</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .prog-fill   { background: linear-gradient(90deg,#EA580C,#F59E0B); }
+  .bloque-pill { background: #FFEDD5; color: #9A3412; }
+  .ctx-box     { background: #FFF7ED; color: #7C2D12; border-color: #EA580C; }
+  .btn-siguiente { background: #EA580C; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <a href="index.html" class="nav-volver">← Volver al menú</a>
-    <h1 style="color:#F59E0B;">Estudios Sociales 🌍</h1>
-    
-    <div id="loader" class="loader" style="display:none;">⏳ Viajando en la historia y geografía...</div>
-    
-    <div id="pantalla-practica">
-      <div id="contexto" style="margin-bottom:15px; font-style:italic;"></div>
-      <div id="enunciado" style="font-weight:bold; font-size:1.2rem; margin-bottom:20px;"></div>
-      <div id="opciones"></div>
-      <div id="feedback"></div>
-      <button id="btn-siguiente" class="btn-accion" style="display:none;" onclick="generar()">Siguiente Ejercicio →</button>
+<header>
+  <span class="logo">🌍</span>
+  <div class="info"><h1>SocialesPRO</h1><p>Tutoría adaptativa · 6° Grado · SDBHS</p></div>
+  <button class="back-btn" onclick="location.href='index.html'">← Inicio</button>
+  <span class="badge">DGEC 2026</span>
+</header>
+<main>
+  <div id="P-inicio" class="card" style="text-align:center;">
+    <div style="font-size:4rem;margin-bottom:14px;">🌍</div>
+    <h2 style="font-size:1.5rem;font-weight:900;color:#9A3412;margin-bottom:8px;">¡Practicá Estudios Sociales!</h2>
+    <p style="color:var(--texto-2);font-weight:600;font-size:.92rem;margin-bottom:24px;line-height:1.6;">Ejercicios sobre geografía, historia y ciudadanía costarricense, alineados al Marco DGEC 2026.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:24px;text-align:left;">
+      <div style="background:#FFEDD5;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#9A3412;">🗺️ Geografía costarricense</div>
+      <div style="background:#FFEDD5;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#9A3412;">🏛️ Instituciones y derechos</div>
+      <div style="background:#FFEDD5;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#9A3412;">⚔️ Historia e independencia</div>
+      <div style="background:#FFEDD5;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#9A3412;">📋 Constitución y ciudadanía</div>
+    </div>
+    <button onclick="iniciar()" style="background:linear-gradient(135deg,#EA580C,#C2410C);color:#fff;border:none;border-radius:14px;padding:16px 44px;font-size:1.05rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;">¡Comenzar práctica! 🚀</button>
+  </div>
+  <div id="prog-wrap" class="prog-wrap" style="display:none;">
+    <span id="prog-label" class="prog-label">Ejercicio 1 de 20</span>
+    <div class="prog-track"><div id="prog-fill" class="prog-fill" style="width:0%"></div></div>
+    <div id="hearts" class="hearts"></div>
+    <span id="bloque-pill" class="bloque-pill">—</span>
+  </div>
+  <div id="card-ejercicio" class="card" style="display:none;">
+    <div id="loader" class="loader"><div class="spinner"></div><p id="loader-msg">Generando ejercicio...</p></div>
+    <div id="contenido" style="display:none;">
+      <div id="ctx-box" class="ctx-box" style="display:none;"></div>
+      <div id="enunciado" class="enunciado"></div>
+      <div id="opciones" class="opciones"></div>
+      <div id="pista-box" class="pista-box"><div class="pista-lbl">💡 Pista</div><div id="pista-texto"></div></div>
+      <div id="ayuda-box" class="ayuda-box"><div class="ayuda-lbl">📚 Así se analiza</div><div id="pasos-div"></div></div>
+      <div id="feedback" class="feedback"></div>
+      <button id="btn-sig" class="btn-siguiente" onclick="siguiente()">Siguiente ejercicio →</button>
     </div>
   </div>
-
-  <script>
-    // CATÁLOGO DE ESTUDIOS SOCIALES (Actualízalo luego con tu PDF)
-    const CFG = {
-      "Geografía de Costa Rica": ["Reconoce las características del relieve costarricense."],
-      "Historia": ["Identifica acontecimientos importantes de la Campaña Nacional de 1856."]
-    };
-
-    async function generar() {
-      document.getElementById('contexto').innerHTML = '';
-      document.getElementById('enunciado').innerHTML = '';
-      document.getElementById('opciones').innerHTML = '';
-      document.getElementById('feedback').className = '';
-      document.getElementById('feedback').innerHTML = '';
-      document.getElementById('btn-siguiente').style.display = 'none';
-      document.getElementById('loader').style.display = 'block';
-
-      const bloques = Object.keys(CFG);
-      const b = bloques[Math.floor(Math.random() * bloques.length)];
-      const a = CFG[b][Math.floor(Math.random() * CFG[b].length)];
-
-      try {
-        const res = await fetch('/api/practica/sociales', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bloque: b, afirmacion: a })
-        });
-        const data = await res.json();
-        
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('contexto').innerText = data.contexto_situacional;
-        document.getElementById('enunciado').innerText = data.enunciado;
-
-        Object.keys(data.opciones).forEach(letra => {
-          const div = document.createElement('div');
-          div.className = 'opcion';
-          div.innerHTML = `<b>${letra})</b> ${data.opciones[letra]}`;
-          div.onclick = () => {
-            document.querySelectorAll('.opcion').forEach(el => el.style.pointerEvents = 'none');
-            if(letra === data.clave) {
-              document.getElementById('feedback').className = 'feedback ok';
-              document.getElementById('feedback').innerHTML = '¡Correcto! Tienes buen dominio del tema.';
-            } else {
-              document.getElementById('feedback').className = 'feedback err';
-              document.getElementById('feedback').innerHTML = 'Respuesta incorrecta. Pista: ' + data.pista;
-            }
-            document.getElementById('btn-siguiente').style.display = 'block';
-          };
-          document.getElementById('opciones').appendChild(div);
-        });
-      } catch (error) {
-        document.getElementById('loader').innerText = 'Ocurrió un error al cargar el ejercicio. Intenta de nuevo.';
-      }
-    }
-
-    // Iniciar automáticamente al abrir la página
-    generar();
-  </script>
+  <div id="P-resumen" class="card" style="display:none;">
+    <div class="resumen">
+      <span class="trophy" id="trophy">🏆</span>
+      <h2 id="res-titulo">¡Sesión completada!</h2>
+      <div class="nota-wrap"><div class="nota-valor" id="nota-valor">—</div><div class="nota-label" id="nota-label">—</div></div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="sv" id="s-cor">0</div><div class="sl">Al primer intento</div></div>
+        <div class="stat-box"><div class="sv" id="s-ay">0</div><div class="sl">Con ayuda</div></div>
+        <div class="stat-box"><div class="sv" id="s-bl">0</div><div class="sl">Bloques practicados</div></div>
+      </div>
+      <div class="mejoras-wrap" id="mejoras-wrap" style="display:none;">
+        <div class="mejoras-titulo">📊 Puntos a mejorar</div><div id="mejoras-lista"></div>
+      </div>
+      <div class="res-btns">
+        <button class="btn-res btn-nueva" onclick="iniciar()">🔄 Nueva sesión</button>
+        <a href="index.html" class="btn-res btn-inicio">📚 Cambiar materia</a>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const CFG = {
+  'Costa Rica: espacio sociogeográfico': [
+    'Reconoce el concepto de Estudios Sociales y Educación Cívica y su importancia para la convivencia social democrática',
+    'Identifica la ubicación de Costa Rica en el contexto hemisférico, continental y regional; reconoce ventajas y desventajas de su posición geográfica',
+    'Reconoce conceptos del relieve de Costa Rica: costas, llanuras, valles y cordilleras, y cómo influyen en actividades humanas',
+    'Reconoce el concepto de región y cómo la regionalización propicia el desarrollo socioeconómico de Costa Rica',
+    'Reconoce las funciones del MEP, PANI, EBAIS, Defensoría de los Habitantes e IMAS como instituciones promotoras de derechos',
+    'Reconoce cómo el clima influye en la biodiversidad y en las actividades cotidianas de los costarricenses',
+    'Distingue buenas prácticas y actitudes ciudadanas que contribuyen a la conservación ambiental de Costa Rica'
+  ],
+  'Costa Rica: construcción histórica y ciudadana': [
+    'Identifica los periodos de la historia antigua de Costa Rica y sus características básicas',
+    'Reconoce los principales asentamientos y la cosmovisión de las etnias de Costa Rica antigua',
+    'Distingue los aportes culturales, sociales y ambientales de los pueblos originarios, africanos y asiáticos a la sociedad costarricense actual',
+    'Reconoce las condiciones actuales y los desafíos de los pueblos originarios en Costa Rica',
+    'Reconoce la influencia cultural de pueblos originarios, africanos y asiáticos en la identidad costarricense multiétnica y plurilingüe',
+    'Distingue las consecuencias culturales, demográficas y sociales de la conquista española en Costa Rica',
+    'Reconoce las características económicas, sociales y culturales de la colonia en Costa Rica y sus aportes a la sociedad actual',
+    'Reconoce la estratificación social y las formas de discriminación sufridas por mujeres, pueblos originarios y afrodescendientes durante la colonia',
+    'Reconoce los principios democráticos del proceso de independencia de Costa Rica: libertad, igualdad y participación ciudadana',
+    'Reconoce la importancia del Pacto de Concordia como pilar fundamental del Estado Nación costarricense',
+    'Reconoce la importancia geográfica y cultural de la Anexión del Partido de Nicoya a Costa Rica',
+    'Distingue el papel del Escudo, la Bandera y el Himno Nacional en la consolidación de la identidad del Estado costarricense',
+    'Reconoce la Campaña Nacional (1856-1857) y sus escenarios: Santa Rosa, Rivas, La Trinidad y la Vía del Tránsito',
+    'Reconoce figuras representativas de la Campaña Nacional y personas que contribuyen al bienestar de Costa Rica',
+    'Distingue las principales Reformas Liberales (1870-1890): Constitución Política de 1871, leyes anticlericales y Reforma Educativa de 1886',
+    'Reconoce los principales logros sociales de la década de 1940 en Costa Rica: salud, educación y trabajo',
+    'Identifica los derechos fundamentales de la Constitución Política de 1949 y su aplicación en la vida cotidiana',
+    'Reconoce los retos actuales de la sociedad costarricense: seguridad vial, gestión de riesgo, redes sociales y cultura fiscal'
+  ]
+};
+const BLOQUES = Object.keys(CFG);
+const REC = { 'Costa Rica: espacio sociogeográfico':'Repasá el relieve, las regiones y las instituciones promotoras de derechos en Costa Rica.','Costa Rica: construcción histórica y ciudadana':'Estudiá la historia de Costa Rica: independencia, Campaña Nacional y derechos constitucionales.' };
+const TOTAL = 20;
+let E = {};
+function resetE(){ E={idx:0,intentos:0,corrPrimer:0,conAyuda:0,bloques:new Set(),data:null,bloqueActual:'',historial:[]}; }
+function iniciar(){ resetE(); document.getElementById('P-inicio').style.display='none'; document.getElementById('P-resumen').style.display='none'; document.getElementById('prog-wrap').style.display='flex'; document.getElementById('card-ejercicio').style.display='block'; generar(); }
+function mostrarResumen(){ document.getElementById('prog-wrap').style.display='none'; document.getElementById('card-ejercicio').style.display='none'; document.getElementById('P-resumen').style.display='block'; const pct=Math.round((E.corrPrimer/TOTAL)*100); let trofeo,titulo,color; if(pct>=90){trofeo='🏆';titulo='¡Resultado sobresaliente!';color='#065F46';}else if(pct>=80){trofeo='🥇';titulo='¡Muy buen desempeño!';color='#065F46';}else if(pct>=70){trofeo='🥈';titulo='¡Buen trabajo!';color='#1E40AF';}else if(pct>=60){trofeo='🥉';titulo='Hay áreas por reforzar';color='#92400E';}else{trofeo='💪';titulo='¡Seguí practicando!';color='#991B1B';} document.getElementById('trophy').textContent=trofeo; document.getElementById('res-titulo').textContent=titulo; document.getElementById('nota-valor').textContent=pct+'%'; document.getElementById('nota-valor').style.color=color; document.getElementById('nota-label').textContent=pct>=90?'Excelente':pct>=80?'Muy bueno':pct>=70?'Bueno':pct>=60?'Regular':'Necesita refuerzo'; document.getElementById('s-cor').textContent=E.corrPrimer; document.getElementById('s-ay').textContent=E.conAyuda; document.getElementById('s-bl').textContent=E.bloques.size; const bf={}; E.historial.forEach(h=>{if(!bf[h.bloque])bf[h.bloque]={ok:0,total:0};bf[h.bloque].total++;if(h.ok)bf[h.bloque].ok++;}); const div=document.getElementById('mejoras-lista');div.innerHTML='';let hay=false; Object.entries(bf).forEach(([bl,d])=>{const p=Math.round((d.ok/d.total)*100);if(p<80){hay=true;div.innerHTML+=`<div class="mejora-item"><div class="mejora-bloque">📌 ${bl} — ${p}% de logro</div><div class="mejora-rec">${REC[bl]||'Repasá los contenidos de este bloque.'}</div></div>`;}}); if(!hay)div.innerHTML='<div style="color:#065F46;font-weight:700;text-align:center;padding:12px;">✅ ¡Excelente desempeño en todos los bloques!</div>'; document.getElementById('mejoras-wrap').style.display='block'; if(pct>=80)confetti(); }
+function actualizarProg(){ document.getElementById('prog-label').textContent=`Ejercicio ${E.idx+1} de ${TOTAL}`; document.getElementById('prog-fill').style.width=`${(E.idx/TOTAL)*100}%`; const h=document.getElementById('hearts');h.innerHTML=''; for(let i=0;i<3;i++){const s=document.createElement('span');s.textContent=i<(3-E.intentos)?'❤️':'🖤';h.appendChild(s);} }
+async function generar(){ const bn=BLOQUES[E.idx%BLOQUES.length]; const afs=CFG[bn]; const af=afs[Math.floor(Math.random()*afs.length)]; E.bloques.add(bn); E.bloqueActual=bn; E.intentos=0; document.getElementById('bloque-pill').textContent=bn; document.getElementById('loader').style.display='flex'; document.getElementById('contenido').style.display='none'; document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); actualizarProg(); try{ const res=await fetch('/api/practica/sociales',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bloque:bn,afirmacion:af})}); if(!res.ok){const e=await res.json();throw new Error(e.error||'Error del servidor');} E.data=await res.json(); mostrar(); }catch(err){ document.getElementById('loader-msg').textContent='⚠️ '+err.message+'. Reintentando...'; setTimeout(generar,3000); } }
+function mostrar(){ document.getElementById('loader').style.display='none'; document.getElementById('contenido').style.display='block'; const d=E.data; const cb=document.getElementById('ctx-box'); if(d.contexto_situacional?.trim()){cb.textContent=d.contexto_situacional;cb.style.display='block';}else cb.style.display='none'; document.getElementById('enunciado').textContent=d.enunciado; const op=document.getElementById('opciones');op.innerHTML=''; ['A','B','C','D'].forEach(l=>{const b=document.createElement('button');b.className='opcion';b.innerHTML=`<span class="letra">${l}</span><span>${d.opciones[l]}</span>`;b.onclick=()=>responder(l);op.appendChild(b);}); }
+function responder(sel){ const d=E.data,ok=sel===d.clave; E.intentos++; const bots=document.querySelectorAll('.opcion'); const fb=document.getElementById('feedback'); if(ok){ bots.forEach(b=>{const l=b.querySelector('.letra').textContent;if(l===sel)b.classList.add('correcta');else b.setAttribute('disabled','');}); if(E.intentos===1){E.corrPrimer++;E.historial.push({bloque:E.bloqueActual,ok:true});fb.className='feedback ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}else if(E.intentos===2){E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}else{E.conAyuda++;E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback warn';fb.textContent='👍 Correcto. Repasá el análisis del ejercicio.';} document.getElementById('btn-sig').classList.add('vis'); }else{ bots.forEach(b=>{if(b.querySelector('.letra').textContent===sel)b.classList.add('incorrecta');}); if(E.intentos===1){fb.className='feedback err';fb.textContent='❌ No es correcta. Revisá la pista e intentá de nuevo.';document.getElementById('pista-texto').textContent=d.pista;document.getElementById('pista-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);}else if(E.intentos===2){fb.className='feedback err';fb.textContent='❌ Casi. Veamos cómo analizar este ejercicio:';const pd=document.getElementById('pasos-div');pd.innerHTML='';d.pasos_resolucion.forEach((p,i)=>{pd.innerHTML+=`<div class="paso"><div class="num">${i+1}</div><p><strong>${p.titulo}:</strong> ${p.explicacion}</p></div>`;});document.getElementById('ayuda-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);} actualizarProg(); } }
+function siguiente(){ E.idx++; if(E.idx>=TOTAL){mostrarResumen();return;} document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); generar(); }
+function confetti(){ const col=['#EA580C','#F59E0B','#10B981','#2563EB','#EF4444']; for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti-p';Object.assign(d.style,{top:'-10px',left:Math.random()*100+'vw',width:(Math.random()*9+5)+'px',height:(Math.random()*9+5)+'px',borderRadius:Math.random()>.5?'50%':'2px',background:col[Math.floor(Math.random()*col.length)],animationDelay:(Math.random()*.6)+'s',animationDuration:(Math.random()*.8+1.4)+'s'});document.body.appendChild(d);setTimeout(()=>d.remove(),2800);} }
+</script>
 </body>
 </html>
