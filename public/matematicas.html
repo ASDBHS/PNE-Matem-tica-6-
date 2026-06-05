@@ -2,97 +2,150 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Práctica Matemáticas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matemáticas - TutoríaPRO</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <a href="index.html" class="nav-volver">← Volver al menú</a>
-    <h1 style="color:#2563EB;">Matemáticas 📐</h1>
-    
-    <div id="loader" class="loader" style="display:none;">⏳ Calculando tu ejercicio...</div>
-    
-    <div id="pantalla-practica">
-      <div id="contexto" style="margin-bottom:15px; font-style:italic;"></div>
-      <div id="enunciado" style="font-weight:bold; font-size:1.2rem; margin-bottom:20px;"></div>
-      <div id="opciones"></div>
-      <div id="feedback"></div>
-      <button id="btn-siguiente" class="btn-accion" style="display:none;" onclick="generar()">Siguiente Ejercicio →</button>
-    </div>
+<div class="container">
+  <a href="index.html" class="nav-volver">← Volver al menú</a>
+  <h1 style="color:#7C3AED;">Matemáticas 📐</h1>
+
+  <div id="loader" class="loader" style="display:none;">⏳ Calculando tu ejercicio...</div>
+
+  <div id="pantalla-practica" style="display:none;">
+    <div id="contexto"></div>
+    <div id="enunciado"></div>
+    <div id="opciones"></div>
+    <div id="feedback"></div>
+    <button id="btn-siguiente" class="btn-accion" style="display:none;" onclick="generar()">
+      Siguiente Ejercicio →
+    </button>
   </div>
+</div>
 
-  <script>
-    // CATÁLOGO DE MATEMÁTICAS (Podemos actualizarlo después con tu PDF)
-    const CFG = {
-      "Números y Operaciones": ["Resuelve problemas aplicando la suma y resta en contextos cotidianos."],
-      "Geometría": ["Identifica figuras geométricas básicas."]
-    };
+<script>
+// ── CATÁLOGO CFG ──
+// BUG FIX: nombres de bloques ahora coinciden EXACTAMENTE con los que espera crearEjercicioMat() en server.js
+const CFG = {
+  "Números": [
+    "Resuelve problemas que implican leer y escribir números naturales hasta 999 999.",
+    "Compara y ordena números naturales usando mayor que, menor que e igual.",
+    "Identifica el valor posicional de los dígitos en números de hasta seis cifras."
+  ],
+  "Operaciones": [
+    "Resuelve problemas aplicando la suma y resta en contextos cotidianos costarricenses.",
+    "Aplica la multiplicación como suma repetida para resolver situaciones concretas.",
+    "Resuelve divisiones exactas en contextos de reparto equitativo.",
+    "Estima resultados de operaciones básicas antes de calcularlos."
+  ],
+  "Geometría": [
+    "Calcula el área de figuras rectangulares usando la fórmula base por altura.",
+    "Identifica y clasifica triángulos, cuadriláteros y círculos según sus propiedades.",
+    "Mide perímetros de figuras geométricas regulares e irregulares.",
+    "Reconoce líneas paralelas, perpendiculares y ángulos en figuras planas."
+  ],
+  "Fracciones": [
+    "Representa fracciones propias e impropias con material concreto y gráfico.",
+    "Compara fracciones con el mismo denominador en situaciones cotidianas.",
+    "Resuelve problemas sencillos que involucran mitades, cuartos y octavos."
+  ]
+};
 
-    async function generar() {
-      document.getElementById('contexto').innerHTML = '';
-      document.getElementById('enunciado').innerHTML = '';
-      document.getElementById('opciones').innerHTML = '';
-      document.getElementById('feedback').className = '';
-      document.getElementById('feedback').innerHTML = '';
-      document.getElementById('btn-siguiente').style.display = 'none';
-      document.getElementById('loader').style.display = 'block';
+// ── MOTOR DE PRÁCTICA ──
+async function generar() {
+  // Limpiar DOM
+  document.getElementById('pantalla-practica').style.display = 'none';
+  document.getElementById('feedback').className = '';
+  document.getElementById('feedback').innerHTML = '';
+  document.getElementById('btn-siguiente').style.display = 'none';
+  document.getElementById('opciones').innerHTML = '';
 
-      const bloques = Object.keys(CFG);
-      const b = bloques[Math.floor(Math.random() * bloques.length)];
-      const a = CFG[b][Math.floor(Math.random() * CFG[b].length)];
+  // Mostrar loader
+  document.getElementById('loader').style.display = 'block';
+  document.getElementById('loader').innerText = '⏳ Calculando tu ejercicio...';
 
-      try {
-        const res = await fetch('/api/practica/matematicas', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bloque: b, afirmacion: a })
-        });
-        const data = await res.json();
-        
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('contexto').innerText = data.contexto_situacional;
-        document.getElementById('enunciado').innerText = data.enunciado;
+  // Seleccionar bloque y afirmación aleatoria
+  const bloques = Object.keys(CFG);
+  const b = bloques[Math.floor(Math.random() * bloques.length)];
+  const afirs = CFG[b];
+  const a = afirs[Math.floor(Math.random() * afirs.length)];
 
-        Object.keys(data.opciones).forEach(letra => {
-          const div = document.createElement('div');
-          div.className = 'opcion';
-          div.innerHTML = `<b>${letra})</b> ${data.opciones[letra]}`;
-          
-          div.onclick = () => {
-            // Bloquear clics extra
-            document.querySelectorAll('.opcion').forEach(el => el.style.pointerEvents = 'none');
-            
-            if(letra === data.clave) {
-              document.getElementById('feedback').className = 'feedback ok';
-              document.getElementById('feedback').innerHTML = '¡Correcto! Excelente cálculo. 💯';
-            } else {
-              document.getElementById('feedback').className = 'feedback err';
-              
-              // Extraer los pasos de resolución para mostrarlos
-              let pasosHtml = '';
-              if (data.pasos_resolucion && data.pasos_resolucion.length > 0) {
-                pasosHtml = data.pasos_resolucion.map(p => `<li><b>${p.titulo}:</b> ${p.explicacion}</li>`).join('');
-                pasosHtml = `<ul style="margin-top:10px; margin-left:20px; font-weight:normal;">${pasosHtml}</ul>`;
-              }
+  try {
+    const res = await fetch('/api/practica/matematicas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bloque: b, afirmacion: a })
+    });
 
-              document.getElementById('feedback').innerHTML = `
-                Respuesta incorrecta.<br><br>
-                <b>Pista:</b> ${data.pista} <br>
-                <b>Cómo resolverlo:</b> ${pasosHtml}
-              `;
-            }
-            document.getElementById('btn-siguiente').style.display = 'block';
-          };
-          document.getElementById('opciones').appendChild(div);
-        });
-      } catch (error) {
-        document.getElementById('loader').innerText = 'Ocurrió un error al cargar el ejercicio. Intenta de nuevo.';
-      }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    // Ocultar loader, mostrar contenido
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('pantalla-practica').style.display = 'block';
+    document.getElementById('contexto').innerText = data.contexto_situacional;
+    document.getElementById('enunciado').innerText = data.enunciado;
+
+    // Renderizar opciones
+    Object.keys(data.opciones).forEach(letra => {
+      const div = document.createElement('div');
+      div.className = 'opcion';
+      div.innerHTML = `<b>${letra})</b> ${data.opciones[letra]}`;
+      div.onclick = () => evaluar(letra, data);
+      document.getElementById('opciones').appendChild(div);
+    });
+
+  } catch (error) {
+    // BUG FIX: ocultar loader y mostrar error en un elemento propio
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('pantalla-practica').style.display = 'block';
+    document.getElementById('contexto').innerHTML = '';
+    document.getElementById('enunciado').innerHTML = '';
+    document.getElementById('feedback').className = 'feedback err';
+    document.getElementById('feedback').innerHTML =
+      `⚠️ Ocurrió un error al cargar el ejercicio.<br>
+       <small style="font-weight:normal;">${error.message}</small>`;
+    document.getElementById('btn-siguiente').style.display = 'block';
+    document.getElementById('btn-siguiente').innerText = 'Reintentar →';
+  }
+}
+
+function evaluar(letraElegida, data) {
+  // Bloquear todas las opciones
+  document.querySelectorAll('.opcion').forEach(el => {
+    el.style.pointerEvents = 'none';
+    el.style.cursor = 'default';
+  });
+
+  const fb = document.getElementById('feedback');
+
+  if (letraElegida === data.clave) {
+    fb.className = 'feedback ok';
+    fb.innerHTML = '✅ ¡Correcto! Excelente cálculo. 💯';
+  } else {
+    // BUG FIX: pasos de resolución renderizados correctamente
+    let pasosHtml = '';
+    if (data.pasos_resolucion && data.pasos_resolucion.length > 0) {
+      const items = data.pasos_resolucion.map(p =>
+        `<li><b>${p.titulo}</b>${p.explicacion}</li>`
+      ).join('');
+      pasosHtml = `<ul>${items}</ul>`;
     }
+    fb.className = 'feedback err';
+    fb.innerHTML = `
+      ❌ Respuesta incorrecta. La correcta era <b>${data.clave}) ${data.opciones[data.clave]}</b>.<br><br>
+      💡 <b>Pista:</b> ${data.pista}
+      ${pasosHtml ? '<br><b>📋 Cómo resolverlo:</b>' + pasosHtml : ''}
+    `;
+  }
+  document.getElementById('btn-siguiente').style.display = 'block';
+  document.getElementById('btn-siguiente').innerText = 'Siguiente Ejercicio →';
+}
 
-    // Iniciar automáticamente al abrir la página
-    generar();
-  </script>
+// Iniciar al cargar la página
+generar();
+</script>
 </body>
 </html>
