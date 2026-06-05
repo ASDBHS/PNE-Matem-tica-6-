@@ -267,34 +267,12 @@ async function generar(){
   const ctx   = CTXS[Math.floor(Math.random()*CTXS.length)];
   const seed  = Math.floor(Math.random()*9000)+1000;
 
-  const prompt = `Genera un ítem de selección única para la Prueba Nacional Estandarizada Diagnóstica de Matemáticas 2026 de Costa Rica, 6° grado primaria.
-
-BLOQUE: ${bloque.id} — ${bloque.nombre}
-AFIRMACIÓN: ${afirm}
-TIPO DE CONTEXTO: ${ctx}
-SEMILLA DE VARIACIÓN: ${seed}
-
-NIVEL DE COMPLEJIDAD: Intermedio-avanzado. El problema debe requerir análisis y razonamiento, no solo cálculo directo. Usá alguno de estos enfoques:
-- Problema de dos o tres pasos donde el estudiante decide qué operaciones usar
-- Situación con información extra que el estudiante debe identificar y descartar
-- Problema inverso: dado el resultado, encontrar el dato faltante
-- Interpretación de datos con una conclusión de análisis
-- Situación cotidiana costarricense real (colones, frutas locales, transportes, lugares del país)
-
-DISTRACTORES: Los tres incorrectos deben representar errores de razonamiento típicos de estudiantes de 6° grado, no valores absurdos.
-
-PISTA: Una pregunta orientadora que ayude al estudiante a identificar el camino correcto sin revelar la respuesta.
-
-PASOS DE RESOLUCIÓN: Explicaciones detalladas con los números concretos del problema.
-
-Responde ÚNICAMENTE con JSON válido sin backticks ni texto extra.`;
-
   try {
     // ── Llama al servidor proxy (misma URL, ruta /api/generar) ──
     const res  = await fetch('/api/generar', {
       method:  'POST',
       headers: {'Content-Type':'application/json'},
-      body:    JSON.stringify({ prompt })
+      body:    JSON.stringify({ bloque: bloque.nombre, afirmacion: afirm })
     });
     if(!res.ok){ const e=await res.json(); throw new Error(e.error||'Error del servidor'); }
     E.data = await res.json();
