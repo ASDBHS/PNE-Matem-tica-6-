@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Práctica Español</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="nav-volver">← Volver al menú</a>
+    <h1 style="color:#8B5CF6;">Español 📖</h1>
+    
+    <div id="loader" class="loader" style="display:none;">⏳ Diseñando tu ejercicio de lectura...</div>
+    
+    <div id="pantalla-practica">
+      <div id="contexto" style="margin-bottom:15px; font-style:italic; line-height: 1.6;"></div>
+      <div id="enunciado" style="font-weight:bold; font-size:1.2rem; margin-bottom:20px;"></div>
+      <div id="opciones"></div>
+      <div id="feedback"></div>
+      <button id="btn-siguiente" class="btn-accion" style="display:none;" onclick="generar()">Siguiente Ejercicio →</button>
+    </div>
+  </div>
+
+  <script>
+    // CATÁLOGO DE ESPAÑOL (Actualízalo luego con tu PDF)
+    const CFG = {
+      "Comprensión de textos literarios": ["Identifica la idea principal en cuentos costarricenses."],
+      "Textos no literarios": ["Reconoce el propósito de una noticia breve."]
+    };
+
+    async function generar() {
+      document.getElementById('contexto').innerHTML = '';
+      document.getElementById('enunciado').innerHTML = '';
+      document.getElementById('opciones').innerHTML = '';
+      document.getElementById('feedback').className = '';
+      document.getElementById('feedback').innerHTML = '';
+      document.getElementById('btn-siguiente').style.display = 'none';
+      document.getElementById('loader').style.display = 'block';
+
+      const bloques = Object.keys(CFG);
+      const b = bloques[Math.floor(Math.random() * bloques.length)];
+      const a = CFG[b][Math.floor(Math.random() * CFG[b].length)];
+
+      try {
+        const res = await fetch('/api/practica/espanol', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bloque: b, afirmacion: a })
+        });
+        const data = await res.json();
+        
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('contexto').innerText = data.contexto_situacional;
+        document.getElementById('enunciado').innerText = data.enunciado;
+
+        Object.keys(data.opciones).forEach(letra => {
+          const div = document.createElement('div');
+          div.className = 'opcion';
+          div.innerHTML = `<b>${letra})</b> ${data.opciones[letra]}`;
+          div.onclick = () => {
+            document.querySelectorAll('.opcion').forEach(el => el.style.pointerEvents = 'none');
+            if(letra === data.clave) {
+              document.getElementById('feedback').className = 'feedback ok';
+              document.getElementById('feedback').innerHTML = '¡Correcto! Excelente análisis.';
+            } else {
+              document.getElementById('feedback').className = 'feedback err';
+              document.getElementById('feedback').innerHTML = 'Respuesta incorrecta. Pista: ' + data.pista;
+            }
+            document.getElementById('btn-siguiente').style.display = 'block';
+          };
+          document.getElementById('opciones').appendChild(div);
+        });
+      } catch (error) {
+        document.getElementById('loader').innerText = 'Ocurrió un error al cargar el ejercicio. Intenta de nuevo.';
+      }
+    }
+
+    // Iniciar automáticamente al abrir la página
+    generar();
+  </script>
+</body>
+</html>
