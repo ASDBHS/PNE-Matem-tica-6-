@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matemáticas · TutoríaPRO</title>
+<title>Matemáticas Sumativa · TutoríaPRO</title>
 <link rel="stylesheet" href="style.css">
 <style>
   .prog-fill  { background: linear-gradient(90deg, #2563EB, #10B981); }
@@ -14,21 +14,17 @@
 </style>
 </head>
 <body>
-
 <header>
   <span class="logo">🧮</span>
-  <div class="info"><h1>MatemáticasPRO</h1><p>Tutoría adaptativa · 6° Grado · SDBHS</p></div>
+  <div class="info"><h1>MatemáticasPRO</h1><p>Prueba Sumativa · Primaria · SDBHS</p></div>
   <button class="back-btn" onclick="location.href='primaria.html'">← Inicio</button>
   <span class="badge">DGEC 2026</span>
 </header>
-
 <main id="main-content">
-
-  <!-- PANTALLA INICIO -->
   <div id="P-inicio" class="card" style="text-align:center;">
     <div style="font-size:4rem;margin-bottom:14px;">🧮</div>
     <h2 style="font-size:1.5rem;font-weight:900;color:var(--azul);margin-bottom:8px;">¡Practicá Matemáticas!</h2>
-    <p style="color:var(--texto-2);font-weight:600;font-size:.92rem;margin-bottom:24px;line-height:1.6;">20 ejercicios distintos cada sesión, alineados al Marco DGEC 2026. Los números son siempre correctos — ¡sin trampas matemáticas!</p>
+    <p style="color:var(--texto-2);font-weight:600;font-size:.92rem;margin-bottom:24px;line-height:1.6;">20 ejercicios por sesión alineados a la Prueba Nacional Estandarizada <strong>Sumativa</strong> de Primaria 2026. Los números son siempre correctos.</p>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:24px;text-align:left;">
       <div style="background:#DBEAFE;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#1E40AF;">🔢 Números y operaciones</div>
       <div style="background:#DBEAFE;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#1E40AF;">📐 Geometría y medidas</div>
@@ -37,299 +33,102 @@
     </div>
     <button onclick="iniciar()" style="background:linear-gradient(135deg,#2563EB,#1B3A6B);color:#fff;border:none;border-radius:14px;padding:16px 44px;font-size:1.05rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;">¡Comenzar práctica! 🚀</button>
   </div>
-
-  <!-- PROGRESO -->
   <div id="prog-wrap" class="prog-wrap" style="display:none;">
     <span id="prog-label" class="prog-label">Ejercicio 1 de 20</span>
     <div class="prog-track"><div id="prog-fill" class="prog-fill" style="width:0%"></div></div>
     <div id="hearts" class="hearts"></div>
     <span id="bloque-pill" class="bloque-pill">—</span>
   </div>
-
-  <!-- CARD EJERCICIO -->
   <div id="card-ejercicio" class="card" style="display:none;">
-    <div id="loader" class="loader">
-      <div class="spinner"></div>
-      <p id="loader-msg">Generando ejercicio...</p>
-    </div>
+    <div id="loader" class="loader"><div class="spinner"></div><p id="loader-msg">Generando ejercicio...</p></div>
     <div id="contenido" style="display:none;">
       <div id="ctx-box" class="ctx-box" style="display:none;"></div>
       <div id="enunciado" class="enunciado"></div>
       <div id="opciones" class="opciones"></div>
-      <div id="pasos-mat" class="pasos-mat">
-        <div class="pasos-mat-lbl">🔢 Así se resuelve paso a paso</div>
-        <ul id="pasos-lista"></ul>
-      </div>
-      <div id="pista-box" class="pista-box">
-        <div class="pista-lbl">💡 Pista</div>
-        <div id="pista-texto"></div>
-      </div>
+      <div id="pasos-mat" class="pasos-mat"><div class="pasos-mat-lbl">🔢 Así se resuelve paso a paso</div><ul id="pasos-lista"></ul></div>
+      <div id="pista-box" class="pista-box"><div class="pista-lbl">💡 Pista</div><div id="pista-texto"></div></div>
       <div id="feedback" class="feedback"></div>
       <button id="btn-sig" class="btn-siguiente" onclick="siguiente()">Siguiente ejercicio →</button>
     </div>
   </div>
-
-  <!-- RESUMEN -->
   <div id="P-resumen" class="card" style="display:none;">
     <div class="resumen">
       <span class="trophy" id="trophy">🏆</span>
       <h2 id="res-titulo">¡Sesión completada!</h2>
-      <div class="nota-wrap">
-        <div class="nota-valor" id="nota-valor">—</div>
-        <div class="nota-label" id="nota-label">—</div>
-      </div>
+      <div class="nota-wrap"><div class="nota-valor" id="nota-valor">—</div><div class="nota-label" id="nota-label">—</div></div>
       <div class="stats-grid">
         <div class="stat-box"><div class="sv" id="s-cor">0</div><div class="sl">Al primer intento</div></div>
         <div class="stat-box"><div class="sv" id="s-ay">0</div><div class="sl">Con ayuda</div></div>
         <div class="stat-box"><div class="sv" id="s-bl">0</div><div class="sl">Bloques practicados</div></div>
       </div>
-      <div class="mejoras-wrap" id="mejoras-wrap" style="display:none;">
-        <div class="mejoras-titulo">📊 Puntos a mejorar</div>
-        <div id="mejoras-lista"></div>
-      </div>
+      <div class="mejoras-wrap" id="mejoras-wrap" style="display:none;"><div class="mejoras-titulo">📊 Puntos a mejorar</div><div id="mejoras-lista"></div></div>
       <div class="res-btns">
         <button class="btn-res btn-nueva" onclick="iniciar()">🔄 Nueva sesión</button>
         <a href="primaria.html" class="btn-res btn-inicio">📚 Cambiar materia</a>
       </div>
     </div>
   </div>
-
 </main>
-
 <script>
-// ══════════════════════════════════════════════════════════
-//  CATÁLOGO DGEC 2026 — MATEMÁTICAS
-// ══════════════════════════════════════════════════════════
 const CFG = {
   'Números': [
-    'Reconoce representaciones de números naturales (≥100000) y decimales hasta la diezmilésima',
-    'Compara números naturales, fracciones o decimales con los símbolos <, > o =',
-    'Resuelve problemas sobre múltiplos, números pares o impares, y divisibilidad por 2, 3, 5 o 10',
-    'Resuelve problemas con las cuatro operaciones aritméticas sobre números naturales o decimales',
+    'Reconoce representaciones de números naturales mayores o iguales a 100 000 y decimales hasta la diezmilésima',
+    'Compara y ordena números naturales, fracciones y decimales usando los símbolos <, > o =',
+    'Reconoce la notación desarrollada de números naturales y decimales, incluyendo potencias de base diez',
+    'Resuelve problemas con múltiplos, divisibilidad por 2, 3, 5 o 10, números primos y compuestos',
+    'Resuelve problemas con las cuatro operaciones sobre números naturales y decimales, incluyendo potencias',
     'Resuelve problemas con fracciones propias, impropias, notación mixta, homogéneas y heterogéneas',
-    'Reconoce el redondeo de decimales y la conversión entre fracción y número decimal'
+    'Determina suma, resta, multiplicación y división de fracciones; identifica el inverso multiplicativo',
+    'Reconoce el redondeo de decimales, fracciones equivalentes, y la conversión entre fracción y decimal'
   ],
   'Geometría': [
-    'Reconoce figuras geométricas planas, sus elementos y propiedades: triángulos, cuadriláteros, polígonos',
-    'Clasifica triángulos según sus ángulos o lados; clasifica cuadriláteros en paralelogramos y no paralelogramos',
-    'Identifica prismas rectangulares, cubos y cilindros y reconoce sus elementos y propiedades',
-    'Determina perímetros y áreas de triángulos, cuadriláteros y figuras planas compuestas',
-    'Reconoce ejes de simetría y figuras simétricas',
-    'Ubica puntos y figuras en sistema de coordenadas (primer cuadrante)'
+    'Identifica elementos y propiedades de triángulos, cuadriláteros, polígonos regulares e irregulares y circunferencias',
+    'Clasifica triángulos según ángulos o lados; clasifica cuadriláteros en paralelogramos y no paralelogramos',
+    'Reconoce prismas rectangulares, cubos y cilindros; identifica planos paralelos y perpendiculares',
+    'Determina el volumen de cuerpos sólidos: cubo, prisma, cilindro, cono, pirámide o esfera',
+    'Resuelve problemas con perímetros y áreas de triángulos, cuadriláteros, polígonos, círculos y figuras compuestas',
+    'Reconoce ejes de simetría, figuras simétricas y figuras obtenidas mediante traslación en el plano de coordenadas'
   ],
   'Medidas': [
-    'Determina conversiones entre unidades de superficie, temperatura (Celsius-Fahrenheit) y tiempo',
-    'Resuelve problemas de conversión entre longitud, masa, capacidad, temperatura o tiempo',
-    'Reconoce relaciones entre monedas y billetes del sistema monetario costarricense',
-    'Resuelve problemas que involucran el sistema monetario nacional costarricense'
+    'Determina conversiones entre unidades de superficie, volumen, temperatura (Celsius-Fahrenheit) y tiempo',
+    'Resuelve problemas de conversión entre unidades cúbicas y entre el decímetro cúbico y el litro',
+    'Resuelve problemas con el sistema monetario costarricense y conversiones entre colones, dólares y euros'
   ],
   'Relaciones y Álgebra': [
-    'Resuelve problemas con patrones en sucesiones de figuras o representaciones geométricas',
-    'Resuelve problemas con patrones en sucesiones numéricas o tablas con números naturales',
-    'Determina relaciones entre dos cantidades presentadas en tablas o escalas',
-    'Determina el valor desconocido (incógnita) en una ecuación matemática dada'
+    'Resuelve problemas con patrones en sucesiones de figuras geométricas o representaciones gráficas',
+    'Resuelve problemas con patrones en sucesiones numéricas con números naturales menores que 1 000 000',
+    'Determina relaciones entre dos cantidades variables presentadas en tablas, plano de coordenadas o escalas',
+    'Determina el valor desconocido (letra) en ecuaciones e inecuaciones matemáticas dadas',
+    'Resuelve problemas con porcentajes, regla de tres y proporcionalidad directa'
   ],
   'Estadística y Probabilidad': [
-    'Interpreta información en tablas, diagramas o gráficos estadísticos',
-    'Interpreta moda, media aritmética, máximo y mínimo de datos en tablas o gráficos',
-    'Reconoce recorrido de un conjunto de datos; distingue población de muestra',
-    'Reconoce situaciones aleatorias e identifica resultados simples de un experimento',
-    'Determina eventos más, igualmente o menos probables; identifica eventos seguros o imposibles'
+    'Interpreta información en tablas, diagramas, cuadros y gráficos estadísticos con frecuencias absolutas',
+    'Interpreta moda, media aritmética, máximo, mínimo y recorrido; distingue población de muestra',
+    'Interpreta frecuencias porcentuales de datos en representaciones con frecuencias absolutas',
+    'Reconoce situaciones aleatorias, identifica resultados simples y determina eventos más, igualmente o menos probables',
+    'Determina la probabilidad de un evento como proporción de resultados favorables entre el total de resultados'
   ]
 };
-
 const BLOQUES = Object.keys(CFG);
 const REC = {
-  'Números':                    'Practicá operaciones con decimales, fracciones y divisibilidad.',
-  'Geometría':                  'Repasá perímetros, áreas y clasificación de figuras geométricas.',
-  'Medidas':                    'Reforzá conversiones del sistema métrico y el sistema monetario costarricense.',
-  'Relaciones y Álgebra':       'Trabajá patrones numéricos y ecuaciones con incógnita.',
-  'Estadística y Probabilidad': 'Practicá lectura de gráficos y cálculo de media, moda y probabilidad.'
+  'Números':                    'Repasá operaciones con fracciones, potencias, divisibilidad y decimales.',
+  'Geometría':                  'Revisá perímetros, áreas, volúmenes y clasificación de figuras geométricas.',
+  'Medidas':                    'Practicá conversiones de unidades y el sistema monetario costarricense.',
+  'Relaciones y Álgebra':       'Trabajá patrones, ecuaciones, regla de tres y proporcionalidad directa.',
+  'Estadística y Probabilidad': 'Reforzá lectura de gráficos, medidas de posición y cálculo de probabilidades.'
 };
-
 const TOTAL = 20;
 let E = {};
-
-function resetE() {
-  E = { idx: 0, intentos: 0, corrPrimer: 0, conAyuda: 0,
-        bloques: new Set(), data: null, bloqueActual: '', historial: [] };
-}
-
-// ── NAVEGACIÓN ────────────────────────────────────────────
-function iniciar() {
-  resetE();
-  document.getElementById('P-inicio').style.display    = 'none';
-  document.getElementById('P-resumen').style.display   = 'none';
-  document.getElementById('prog-wrap').style.display   = 'flex';
-  document.getElementById('card-ejercicio').style.display = 'block';
-  generar();
-}
-
-function mostrarResumen() {
-  document.getElementById('prog-wrap').style.display      = 'none';
-  document.getElementById('card-ejercicio').style.display = 'none';
-  document.getElementById('P-resumen').style.display      = 'block';
-
-  const pct = Math.round((E.corrPrimer / TOTAL) * 100);
-  let trofeo, titulo, color;
-  if (pct >= 90) { trofeo = '🏆'; titulo = '¡Resultado sobresaliente!'; color = '#065F46'; }
-  else if (pct >= 80) { trofeo = '🥇'; titulo = '¡Muy buen desempeño!';  color = '#065F46'; }
-  else if (pct >= 70) { trofeo = '🥈'; titulo = '¡Buen trabajo!';        color = '#1E40AF'; }
-  else if (pct >= 60) { trofeo = '🥉'; titulo = 'Hay áreas por reforzar'; color = '#92400E'; }
-  else                 { trofeo = '💪'; titulo = '¡Seguí practicando!';   color = '#991B1B'; }
-
-  document.getElementById('trophy').textContent    = trofeo;
-  document.getElementById('res-titulo').textContent = titulo;
-  document.getElementById('nota-valor').textContent = pct + '%';
-  document.getElementById('nota-valor').style.color = color;
-  document.getElementById('nota-label').textContent =
-    pct >= 90 ? 'Excelente' : pct >= 80 ? 'Muy bueno' : pct >= 70 ? 'Bueno' : pct >= 60 ? 'Regular' : 'Necesita refuerzo';
-  document.getElementById('s-cor').textContent = E.corrPrimer;
-  document.getElementById('s-ay').textContent  = E.conAyuda;
-  document.getElementById('s-bl').textContent  = E.bloques.size;
-
-  // Puntos a mejorar
-  const bf = {};
-  E.historial.forEach(h => {
-    if (!bf[h.bloque]) bf[h.bloque] = { ok: 0, total: 0 };
-    bf[h.bloque].total++;
-    if (h.ok) bf[h.bloque].ok++;
-  });
-  const div = document.getElementById('mejoras-lista');
-  div.innerHTML = '';
-  let hay = false;
-  Object.entries(bf).forEach(([bl, d]) => {
-    const p = Math.round((d.ok / d.total) * 100);
-    if (p < 80) {
-      hay = true;
-      div.innerHTML += `<div class="mejora-item"><div class="mejora-bloque">📌 ${bl} — ${p}% de logro</div><div class="mejora-rec">${REC[bl] || 'Repasá los contenidos de este bloque.'}</div></div>`;
-    }
-  });
-  if (!hay) div.innerHTML = '<div style="color:#065F46;font-weight:700;text-align:center;padding:12px;">✅ ¡Excelente desempeño en todos los bloques!</div>';
-  document.getElementById('mejoras-wrap').style.display = 'block';
-  if (pct >= 80) confetti();
-}
-
-// ── PROGRESO ──────────────────────────────────────────────
-function actualizarProg() {
-  document.getElementById('prog-label').textContent = `Ejercicio ${E.idx + 1} de ${TOTAL}`;
-  document.getElementById('prog-fill').style.width  = `${(E.idx / TOTAL) * 100}%`;
-  const h = document.getElementById('hearts'); h.innerHTML = '';
-  for (let i = 0; i < 3; i++) { const s = document.createElement('span'); s.textContent = i < (3 - E.intentos) ? '❤️' : '🖤'; h.appendChild(s); }
-}
-
-// ── GENERAR ───────────────────────────────────────────────
-async function generar() {
-  const bloqueNombre = BLOQUES[E.idx % BLOQUES.length];
-  const afirmaciones = CFG[bloqueNombre];
-  const afirm = afirmaciones[Math.floor(Math.random() * afirmaciones.length)];
-  E.bloques.add(bloqueNombre);
-  E.bloqueActual = bloqueNombre;
-  E.intentos = 0;
-
-  document.getElementById('bloque-pill').textContent = bloqueNombre;
-  document.getElementById('loader').style.display    = 'flex';
-  document.getElementById('contenido').style.display = 'none';
-  document.getElementById('pasos-mat').classList.remove('vis');
-  document.getElementById('pista-box').classList.remove('vis');
-  document.getElementById('feedback').className = 'feedback';
-  document.getElementById('btn-sig').classList.remove('vis');
-  actualizarProg();
-
-  try {
-    const res  = await fetch('/api/generar', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ materia: 'mat', bloque: bloqueNombre, afirmacion: afirm })
-    });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Error del servidor'); }
-    E.data = await res.json();
-    mostrar();
-  } catch (err) {
-    document.getElementById('loader-msg').textContent = '⚠️ ' + err.message + '. Reintentando...';
-    setTimeout(generar, 3000);
-  }
-}
-
-// ── MOSTRAR ───────────────────────────────────────────────
-function mostrar() {
-  document.getElementById('loader').style.display    = 'none';
-  document.getElementById('contenido').style.display = 'block';
-  const d = E.data;
-  const cb = document.getElementById('ctx-box');
-  if (d.contexto_situacional?.trim()) { cb.textContent = d.contexto_situacional; cb.style.display = 'block'; }
-  else cb.style.display = 'none';
-  document.getElementById('enunciado').textContent = d.enunciado;
-  const op = document.getElementById('opciones'); op.innerHTML = '';
-  ['A', 'B', 'C', 'D'].forEach(l => {
-    const b = document.createElement('button'); b.className = 'opcion';
-    b.innerHTML = `<span class="letra">${l}</span><span>${d.opciones[l]}</span>`;
-    b.onclick = () => responder(l); op.appendChild(b);
-  });
-}
-
-// ── RESPONDER ─────────────────────────────────────────────
-function responder(sel) {
-  const d = E.data, ok = sel === d.clave;
-  E.intentos++;
-  const bots = document.querySelectorAll('.opcion');
-  const fb   = document.getElementById('feedback');
-
-  if (ok) {
-    bots.forEach(b => { const l = b.querySelector('.letra').textContent; if (l === sel) b.classList.add('correcta'); else b.setAttribute('disabled', ''); });
-    if (E.intentos === 1) {
-      E.corrPrimer++; E.historial.push({ bloque: E.bloqueActual, ok: true });
-      fb.className = 'feedback ok'; fb.textContent = '🎉 ¡Excelente! Respuesta correcta al primer intento.'; confetti();
-    } else if (E.intentos === 2) {
-      E.historial.push({ bloque: E.bloqueActual, ok: false });
-      fb.className = 'feedback ok'; fb.textContent = '✅ ¡Bien hecho! Lo lograste en el segundo intento.';
-    } else {
-      E.conAyuda++; E.historial.push({ bloque: E.bloqueActual, ok: false });
-      fb.className = 'feedback warn'; fb.textContent = '👍 Correcto. Repasá los pasos para afianzar el tema.';
-    }
-    document.getElementById('btn-sig').classList.add('vis');
-  } else {
-    bots.forEach(b => { if (b.querySelector('.letra').textContent === sel) b.classList.add('incorrecta'); });
-    if (E.intentos === 1) {
-      fb.className = 'feedback err'; fb.textContent = '❌ No es correcta. Revisá la pista e intentá de nuevo.';
-      document.getElementById('pista-texto').textContent = d.pista;
-      document.getElementById('pista-box').classList.add('vis');
-      setTimeout(() => { bots.forEach(b => { if (!b.classList.contains('incorrecta')) b.removeAttribute('disabled'); }); }, 350);
-    } else if (E.intentos === 2) {
-      fb.className = 'feedback err'; fb.textContent = '❌ Casi. Estudiemos el procedimiento paso a paso:';
-      // MATEMÁTICAS: mostrar pasos en lista
-      const lista = document.getElementById('pasos-lista'); lista.innerHTML = '';
-      d.pasos_resolucion.forEach((p, i) => {
-        lista.innerHTML += `<li><span class="n">${i + 1}</span><span><strong>${p.titulo}:</strong> ${p.explicacion}</span></li>`;
-      });
-      document.getElementById('pasos-mat').classList.add('vis');
-      setTimeout(() => { bots.forEach(b => { if (!b.classList.contains('incorrecta')) b.removeAttribute('disabled'); }); }, 350);
-    }
-    actualizarProg();
-  }
-}
-
-// ── SIGUIENTE ─────────────────────────────────────────────
-function siguiente() {
-  E.idx++;
-  if (E.idx >= TOTAL) { mostrarResumen(); return; }
-  document.getElementById('pasos-mat').classList.remove('vis');
-  document.getElementById('pista-box').classList.remove('vis');
-  document.getElementById('feedback').className = 'feedback';
-  document.getElementById('btn-sig').classList.remove('vis');
-  generar();
-}
-
-// ── CONFETTI ──────────────────────────────────────────────
-function confetti() {
-  const col = ['#1B3A6B','#F59E0B','#10B981','#2563EB','#EF4444'];
-  for (let i = 0; i < 40; i++) {
-    const d = document.createElement('div'); d.className = 'confetti-p';
-    Object.assign(d.style, { top: '-10px', left: Math.random() * 100 + 'vw', width: (Math.random() * 9 + 5) + 'px', height: (Math.random() * 9 + 5) + 'px', borderRadius: Math.random() > .5 ? '50%' : '2px', background: col[Math.floor(Math.random() * col.length)], animationDelay: (Math.random() * .6) + 's', animationDuration: (Math.random() * .8 + 1.4) + 's' });
-    document.body.appendChild(d); setTimeout(() => d.remove(), 2800);
-  }
-}
+function resetE(){ E={idx:0,intentos:0,corrPrimer:0,conAyuda:0,bloques:new Set(),data:null,bloqueActual:'',historial:[]}; }
+function iniciar(){ resetE(); document.getElementById('P-inicio').style.display='none'; document.getElementById('P-resumen').style.display='none'; document.getElementById('prog-wrap').style.display='flex'; document.getElementById('card-ejercicio').style.display='block'; generar(); }
+function mostrarResumen(){ document.getElementById('prog-wrap').style.display='none'; document.getElementById('card-ejercicio').style.display='none'; document.getElementById('P-resumen').style.display='block'; const pct=Math.round((E.corrPrimer/TOTAL)*100); let trofeo,titulo,color; if(pct>=90){trofeo='🏆';titulo='¡Resultado sobresaliente!';color='#065F46';}else if(pct>=80){trofeo='🥇';titulo='¡Muy buen desempeño!';color='#065F46';}else if(pct>=70){trofeo='🥈';titulo='¡Buen trabajo!';color='#1E40AF';}else if(pct>=60){trofeo='🥉';titulo='Hay áreas por reforzar';color='#92400E';}else{trofeo='💪';titulo='¡Seguí practicando!';color='#991B1B';} document.getElementById('trophy').textContent=trofeo; document.getElementById('res-titulo').textContent=titulo; document.getElementById('nota-valor').textContent=pct+'%'; document.getElementById('nota-valor').style.color=color; document.getElementById('nota-label').textContent=pct>=90?'Excelente':pct>=80?'Muy bueno':pct>=70?'Bueno':pct>=60?'Regular':'Necesita refuerzo'; document.getElementById('s-cor').textContent=E.corrPrimer; document.getElementById('s-ay').textContent=E.conAyuda; document.getElementById('s-bl').textContent=E.bloques.size; const bf={}; E.historial.forEach(h=>{if(!bf[h.bloque])bf[h.bloque]={ok:0,total:0};bf[h.bloque].total++;if(h.ok)bf[h.bloque].ok++;}); const div=document.getElementById('mejoras-lista');div.innerHTML='';let hay=false; Object.entries(bf).forEach(([bl,d])=>{const p=Math.round((d.ok/d.total)*100);if(p<80){hay=true;div.innerHTML+=`<div class="mejora-item"><div class="mejora-bloque">📌 ${bl} — ${p}% de logro</div><div class="mejora-rec">${REC[bl]||'Repasá los contenidos de este bloque.'}</div></div>`;}}); if(!hay)div.innerHTML='<div style="color:#065F46;font-weight:700;text-align:center;padding:12px;">✅ ¡Excelente desempeño en todos los bloques!</div>'; document.getElementById('mejoras-wrap').style.display='block'; if(pct>=80)confetti(); }
+function actualizarProg(){ document.getElementById('prog-label').textContent=`Ejercicio ${E.idx+1} de ${TOTAL}`; document.getElementById('prog-fill').style.width=`${(E.idx/TOTAL)*100}%`; const h=document.getElementById('hearts');h.innerHTML=''; for(let i=0;i<3;i++){const s=document.createElement('span');s.textContent=i<(3-E.intentos)?'❤️':'🖤';h.appendChild(s);} }
+async function generar(){ const bn=BLOQUES[E.idx%BLOQUES.length]; const afs=CFG[bn]; const af=afs[Math.floor(Math.random()*afs.length)]; E.bloques.add(bn); E.bloqueActual=bn; E.intentos=0; document.getElementById('bloque-pill').textContent=bn; document.getElementById('loader').style.display='flex'; document.getElementById('contenido').style.display='none'; document.getElementById('pasos-mat').classList.remove('vis'); document.getElementById('pista-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); actualizarProg(); try{ const res=await fetch('/api/generar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({materia:'mat-sum',bloque:bn,afirmacion:af,nivel:'primaria-sumativa'})}); if(!res.ok){const e=await res.json();throw new Error(e.error||'Error del servidor');} E.data=await res.json(); mostrar(); }catch(err){ document.getElementById('loader-msg').textContent='⚠️ '+err.message+'. Reintentando...'; setTimeout(generar,3000); } }
+function mostrar(){ document.getElementById('loader').style.display='none'; document.getElementById('contenido').style.display='block'; const d=E.data; const cb=document.getElementById('ctx-box'); if(d.contexto_situacional?.trim()){cb.textContent=d.contexto_situacional;cb.style.display='block';}else cb.style.display='none'; document.getElementById('enunciado').textContent=d.enunciado; const op=document.getElementById('opciones');op.innerHTML=''; ['A','B','C','D'].forEach(l=>{const b=document.createElement('button');b.className='opcion';b.innerHTML=`<span class="letra">${l}</span><span>${d.opciones[l]}</span>`;b.onclick=()=>responder(l);op.appendChild(b);}); }
+function responder(sel){ const d=E.data,ok=sel===d.clave; E.intentos++; const bots=document.querySelectorAll('.opcion'); const fb=document.getElementById('feedback'); if(ok){ bots.forEach(b=>{const l=b.querySelector('.letra').textContent;if(l===sel)b.classList.add('correcta');else b.setAttribute('disabled','');}); if(E.intentos===1){E.corrPrimer++;E.historial.push({bloque:E.bloqueActual,ok:true});fb.className='feedback ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}else if(E.intentos===2){E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}else{E.conAyuda++;E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback warn';fb.textContent='👍 Correcto. Repasá los pasos para afianzar el tema.';} document.getElementById('btn-sig').classList.add('vis'); }else{ bots.forEach(b=>{if(b.querySelector('.letra').textContent===sel)b.classList.add('incorrecta');}); if(E.intentos===1){fb.className='feedback err';fb.textContent='❌ No es correcta. Revisá la pista e intentá de nuevo.';document.getElementById('pista-texto').textContent=d.pista;document.getElementById('pista-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);}else if(E.intentos===2){fb.className='feedback err';fb.textContent='❌ Casi. Estudiemos el procedimiento paso a paso:';const lista=document.getElementById('pasos-lista');lista.innerHTML='';d.pasos_resolucion.forEach((p,i)=>{lista.innerHTML+=`<li><span class="n">${i+1}</span><span><strong>${p.titulo}:</strong> ${p.explicacion}</span></li>`;});document.getElementById('pasos-mat').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);} actualizarProg(); } }
+function siguiente(){ E.idx++; if(E.idx>=TOTAL){mostrarResumen();return;} document.getElementById('pasos-mat').classList.remove('vis'); document.getElementById('pista-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); generar(); }
+function confetti(){ const col=['#1B3A6B','#F59E0B','#10B981','#2563EB','#EF4444']; for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti-p';Object.assign(d.style,{top:'-10px',left:Math.random()*100+'vw',width:(Math.random()*9+5)+'px',height:(Math.random()*9+5)+'px',borderRadius:Math.random()>.5?'50%':'2px',background:col[Math.floor(Math.random()*col.length)],animationDelay:(Math.random()*.6)+'s',animationDuration:(Math.random()*.8+1.4)+'s'});document.body.appendChild(d);setTimeout(()=>d.remove(),2800);} }
 </script>
-
 <footer style="width:100%;text-align:center;padding:18px 0 28px;font-family:'Nunito',sans-serif;font-size:.95rem;color:#94A3B8;font-weight:600;letter-spacing:.3px;">Diseñado por <strong style="color:#1B3A6B;">Eduardo Romero C.</strong> · SDBHS · DGEC 2026</footer>
 </body>
 </html>
