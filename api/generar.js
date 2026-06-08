@@ -75,6 +75,26 @@ async function llamarGroq(apiKey, prompt) {
   if (ini === -1 || fin === -1) throw new Error('Sin JSON válido en respuesta');
   const ejercicio = JSON.parse(texto.substring(ini, fin + 1));
   if (!ejercicio.enunciado || !ejercicio.opciones || !ejercicio.clave) throw new Error('JSON incompleto');
+
+  // Sanitizar pasos_resolucion — Groq a veces devuelve campos con nombres distintos o arrays cortos
+  if (!Array.isArray(ejercicio.pasos_resolucion)) {
+    ejercicio.pasos_resolucion = [];
+  }
+  ejercicio.pasos_resolucion = ejercicio.pasos_resolucion.map(function(p) {
+    return {
+      titulo:      p.titulo      || p.paso        || p.title       || p.nombre   || 'Paso',
+      explicacion: p.explicacion || p.descripcion || p.explanation || p.detalle  || p.contenido || p.texto || ''
+    };
+  });
+  while (ejercicio.pasos_resolucion.length < 4) {
+    ejercicio.pasos_resolucion.push({ titulo: 'Verificar', explicacion: 'Comprobá que la respuesta sea consistente con el contexto y el concepto evaluado.' });
+  }
+
+  // Sanitizar pista
+  if (!ejercicio.pista || typeof ejercicio.pista !== 'string') {
+    ejercicio.pista = 'Revisá el contexto y relacionalo con el concepto clave del bloque temático.';
+  }
+
   return ejercicio;
 }
 
