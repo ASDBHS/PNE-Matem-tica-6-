@@ -58,7 +58,8 @@ async function llamarGroq(apiKey, prompt) {
       'Authorization': 'Bearer ' + apiKey
     },
     body: JSON.stringify({
-      model: 'llama3-70b-8192',
+      // ¡AQUÍ ESTÁ LA CORRECCIÓN! Se actualizó al modelo vigente.
+      model: 'llama-3.3-70b-versatile', 
       max_tokens: 1500,
       temperature: 0.85,
       response_format: { type: 'json_object' },
@@ -76,13 +77,13 @@ async function llamarGroq(apiKey, prompt) {
   const ejercicio = JSON.parse(texto.substring(ini, fin + 1));
   if (!ejercicio.enunciado || !ejercicio.opciones || !ejercicio.clave) throw new Error('JSON incompleto');
 
-  // Sanitizar pasos_resolucion — Groq a veces devuelve campos con nombres distintos o arrays cortos
+  // Sanitizar pasos_resolucion
   if (!Array.isArray(ejercicio.pasos_resolucion)) {
     ejercicio.pasos_resolucion = [];
   }
   ejercicio.pasos_resolucion = ejercicio.pasos_resolucion.map(function(p) {
     return {
-      titulo:      p.titulo      || p.paso        || p.title       || p.nombre   || 'Paso',
+      titulo:      p.titulo      || p.paso        || p.title       || p.nombre    || 'Paso',
       explicacion: p.explicacion || p.descripcion || p.explanation || p.detalle  || p.contenido || p.texto || ''
     };
   });
@@ -347,7 +348,7 @@ const PROMPTS = {
 };
 
 // ══════════════════════════════════════════════════════════════
-//  HANDLER PRINCIPAL
+//  HANDLER PRINCIPAL (COMPLETADO Y REPARADO)
 // ══════════════════════════════════════════════════════════════
 
 module.exports = async function handler(req, res) {
@@ -366,35 +367,47 @@ module.exports = async function handler(req, res) {
     // ── MATEMÁTICAS PRIMARIA (plantillas exactas, sin IA) ────
     if (materia === 'mat') {
       const ej = crearEjercicioMat();
-      const rawOps  = { A: ej.correcta, B: ej.d[0], C: ej.d[1], D: ej.d[2] };
-      const unique  = garantizarUnicas(rawOps);
-      const mixed   = mezclar(unique, 'A');
+      const opcionesIniciales = { A: ej.correcta, B: ej.d[0], C: ej.d[1], D: ej.d[2] };
+      const garantizadas = garantizarUnicas(opcionesIniciales);
+      const { opciones, clave } = mezclar(garantizadas, 'A');
+
       return res.status(200).json({
         contexto_situacional: ej.ctx,
-        enunciado:            ej.enunciado,
-        opciones:             mixed.opciones,
-        clave:                mixed.clave,
-        pista:                ej.pista,
-        pasos_resolucion:     ej.pasos
+        enunciado: ej.enunciado,
+        opciones: opciones,
+        clave: clave,
+        pista: ej.pista,
+        pasos_resolucion: ej.pasos
       });
+    } 
+    // ── RESTO DE MATERIAS (generación con IA de Groq) ────
+    else {
+      const apiKey = process.env.GROQ_API_KEY; // Asumiendo que usas variables de entorno en Vercel
+      if (!apiKey) {
+        throw new Error('Falta la variable de entorno GROQ_API_KEY en Vercel');
+      }
+
+      const generarPrompt = PROMPTS[materia];
+      if (!generarPrompt) {
+        throw new Error('Materia no soportada o prompt no definido: ' + materia);
+      }
+
+      const promptCompleto = generarPrompt(bloque, afirmacion);
+      
+      // Llamada a la API de Groq ya corregida con el nuevo modelo
+      const ejercicioIA = await llamarGroq(apiKey, promptCompleto);
+
+      // Mezclar y garantizar opciones únicas devueltas por la IA
+      const garantizadas = garantizarUnicas(ejercicioIA.opciones);
+      const { opciones, clave } = mezclar(garantizadas, ejercicioIA.clave);
+      
+      ejercicioIA.opciones = opciones;
+      ejercicioIA.clave = clave;
+
+      return res.status(200).json(ejercicioIA);
     }
-
-    // ── TODAS LAS DEMÁS MATERIAS (IA vía Groq) ───────────────
-    const promptFn = PROMPTS[materia];
-    if (!promptFn) return res.status(400).json({ error: 'Materia no reconocida: ' + materia });
-
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey)  return res.status(500).json({ error: 'GROQ_API_KEY no configurada' });
-
-    const ejercicio = await llamarGroq(apiKey, promptFn(bloque, afirmacion));
-    const mixed     = mezclar(ejercicio.opciones, ejercicio.clave);
-    ejercicio.opciones = mixed.opciones;
-    ejercicio.clave    = mixed.clave;
-
-    return res.status(200).json(ejercicio);
-
-  } catch (err) {
-    console.error('[/api/generar] materia=' + materia + ':', err.message);
-    return res.status(500).json({ error: err.message || 'Error interno' });
+  } catch (error) {
+    console.error('Error en TutoríaPRO:', error);
+    return res.status(500).json({ error: error.message });
   }
 };
