@@ -427,8 +427,18 @@ module.exports = async function handler(req, res) {
     const promptFn = PROMPTS[materia];
     if (!promptFn) return res.status(400).json({ error: 'Materia no reconocida: ' + materia });
 
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey)  return res.status(500).json({ error: 'GROQ_API_KEY no configurada' });
+    // Rotar entre keys disponibles para multiplicar el límite diario
+    const keys = [
+      process.env.GROQ_API_KEY,
+      process.env.GROQ_API_KEY_2,
+      process.env.GROQ_API_KEY_3,
+      process.env.GROQ_API_KEY_4
+    ].filter(Boolean);
+
+    if (keys.length === 0) return res.status(500).json({ error: 'GROQ_API_KEY no configurada' });
+
+    // Elegir key aleatoriamente para distribuir la carga
+    const apiKey = keys[Math.floor(Math.random() * keys.length)];
 
     const ejercicio = await llamarGroq(apiKey, promptFn(bloque, afirmacion));
     const mixed     = mezclar(ejercicio.opciones, ejercicio.clave);
