@@ -58,8 +58,8 @@ async function llamarGroq(apiKey, prompt) {
       'Authorization': 'Bearer ' + apiKey
     },
     body: JSON.stringify({
-      // ¡AQUÍ ESTÁ LA CORRECCIÓN! Se actualizó al modelo vigente.
-      model: 'llama-3.3-70b-versatile', 
+      // ¡INTEGRADO! Se cambió al modelo Mixtral para evitar el límite de rango diario.
+      model: 'mixtral-8x7b-32768', 
       max_tokens: 1500,
       temperature: 0.85,
       response_format: { type: 'json_object' },
@@ -318,7 +318,7 @@ const PROMPTS = {
   },
 
   'sec-ss': function(b, a) {
-    return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada SUMATIVA de Estudios Sociales 2026, 11° año, secundaria costarricense.\n\nBLOQUE: ' + b + '\nAFIRMACIÓN/EVIDENCIA: ' + a + '\n\nREGLAS OBLIGATORIAS:\n1. CONTEXTO TEXTUAL CONCRETO: usá siempre una fuente concreta — cita histórica, estadística, mapa descrito, noticia o caso real directamente relacionado con el bloque. El estudiante debe analizar ese contexto para responder.\n2. ANÁLISIS E INFERENCIA: la pregunta pide analizar causas, consecuencias, comparar procesos o inferir implicaciones — nunca solo reconocer un dato memorístico.\n3. PERTINENCIA COSTARRICENSE: para bloques sobre Costa Rica, relacioná con impacto en la vida cotidiana actual. Para bloques mundiales, usá ejemplos con relevancia para el contexto latinoamericano.\n4. DISTRACTORES PLAUSIBLES: respuestas históricamente posibles pero incorrectas para el contexto específico planteado.\n5. La clave NO debe ser siempre A — variá la posición.\n\n' + JSON_SCHEMA;
+    return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada SUMATIVA de Estudios Sociales 2026, 11° año, secundaria costarricense.\n\nBLOQUE: ' + b + '\nAFIRMACIÓN/EVIDENCIA: ' + a + '\n\nREGLAS OBLIGATORIAS:\n1. CONTEXTO TEXTUAL CONCRETO: usá siempre una fuente concreta — cita histórica, estadística, mapa descrito, noticia o caso real directamente relacionado con el bloque. El estudiante debe analizar ese contexto para responder.\n2. ANÁLISIS E INFERENCIA: la pregunta pide analizar causas, consecuencias, comparar procesos o inferir implicaciones — nunca solo reconocer un dato memorístico.\n3. PERTINENCIA COSTARRICENSE: para bloques sobre Costa Rica, relacioná con impacto en la vida cotidiana actual. Para bloques mundiales, usá examples con relevancia para el contexto latinoamericano.\n4. DISTRACTORES PLAUSIBLES: respuestas históricamente posibles pero incorrectas para el contexto específico planteado.\n5. La clave NO debe ser siempre A — variá la posición.\n\n' + JSON_SCHEMA;
   },
 
   'sec-civ': function(b, a) {
@@ -342,13 +342,13 @@ const PROMPTS = {
   },
 
   'ss-sum': function(b, a) {
-    return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada SUMATIVA de Estudios Sociales 2026, primaria costarricense.\n\nBLOQUE: ' + b + '\nAFIRMACIÓN/EVIDENCIA: ' + a + '\n\nREGLAS OBLIGATORIAS:\n1. CONTEXTO COSTARRICENSE CONCRETO: el contexto_situacional debe presentar una situación, fuente histórica breve, dato geográfico o escenario ciudadano CONCRETO de Costa Rica directamente relacionado con la afirmación (ej: texto sobre la Campaña Nacional, descripción de una región geográfica, caso de participación ciudadana).\n2. COHERENCIA TOTAL: el contexto y la pregunta deben hablar del MISMO tema. Si la afirmación es sobre la Anexión del Partido de Nicoya, el contexto y la pregunta tratan ese evento.\n3. ANÁLISIS E INFERENCIA: la pregunta pide analizar, comparar, inferir consecuencias o distinguir efectos — NUNCA solo recordar fechas o nombres.\n4. DISTRACTORES PLAUSIBLES: confusiones históricas o geográficas comunes de estudiantes de primaria costarricense.\n5. VERIFICÁ que la clave sea históricamente correcta.\n6. La clave NO debe ser siempre A — variá la posición.\n\n' + JSON_SCHEMA;
+    return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada SUMATIVA de Estudios Sociales 2026, primaria costarricense.\n\nBLOQUE: ' + b + '\nAFIRMACIÓN/EVIDENCIA: ' + a + '\n\nREGLAS OBLIGATORIAS:\n1. CONTEXTO COSTARRICENSE CONCRETO: el contexto_situacional debe presentar una situación, fuente histórica breve, dato geográfico o escenario ciudadano CONCRETO de Costa Rica directamente relacionado con la afirmación (ej: texto sobre la Campaña Nacional, descripción de una región geográfica, caso de participación ciudadana).\n2. COHERENCIA TOTAL: el contexto y la pregunta deben hablar del MISMO tema. Si la afirmación es sobre la Anexión del Partido de Nicoya, el contexto y la pregunta tratan ese evento.\n3. ANÁLISIS E INFERENCIA: la pregunta pide analizar, comparar, inferir consecuencias o distinguir efectos — NUNCA solo recordar fechas o nombres.\n4. DISTRACTORES PLAUSIBLES: respuestas o confusiones históricas/geográficas comunes de estudiantes de primaria costarricense.\n5. VERIFICÁ que la clave sea históricamente correcta.\n6. La clave NO debe ser siempre A — variá la posición.\n\n' + JSON_SCHEMA;
   }
 
 };
 
 // ══════════════════════════════════════════════════════════════
-//  HANDLER PRINCIPAL (COMPLETADO Y REPARADO)
+//  HANDLER PRINCIPAL
 // ══════════════════════════════════════════════════════════════
 
 module.exports = async function handler(req, res) {
@@ -382,7 +382,7 @@ module.exports = async function handler(req, res) {
     } 
     // ── RESTO DE MATERIAS (generación con IA de Groq) ────
     else {
-      const apiKey = process.env.GROQ_API_KEY; // Asumiendo que usas variables de entorno en Vercel
+      const apiKey = process.env.GROQ_API_KEY; 
       if (!apiKey) {
         throw new Error('Falta la variable de entorno GROQ_API_KEY en Vercel');
       }
@@ -394,10 +394,10 @@ module.exports = async function handler(req, res) {
 
       const promptCompleto = generarPrompt(bloque, afirmacion);
       
-      // Llamada a la API de Groq ya corregida con el nuevo modelo
+      // Llamada a la API de Groq usando Mixtral
       const ejercicioIA = await llamarGroq(apiKey, promptCompleto);
 
-      // Mezclar y garantizar opciones únicas devueltas por la IA
+      // Mezclar y garantizar opciones únicas
       const garantizadas = garantizarUnicas(ejercicioIA.opciones);
       const { opciones, clave } = mezclar(garantizadas, ejercicioIA.clave);
       
