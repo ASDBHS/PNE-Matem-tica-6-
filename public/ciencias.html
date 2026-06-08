@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ciencias · TutoríaPRO</title>
+<title>Ciencias Sumativa · TutoríaPRO</title>
 <link rel="stylesheet" href="style.css">
 <style>
   .prog-fill   { background: linear-gradient(90deg,#0D9488,#0EA5E9); }
@@ -16,22 +16,22 @@
 <body>
 <header>
   <span class="logo">🔬</span>
-  <div class="info"><h1>CienciasPRO</h1><p>Tutoría adaptativa · 6° Grado · SDBHS</p></div>
+  <div class="info"><h1>CienciasPRO</h1><p>Ciencias · Sumativa · SDBHS</p></div>
   <button class="back-btn" onclick="location.href='primaria.html'">← Inicio</button>
   <span class="badge">DGEC 2026</span>
 </header>
-<main>
+<main id="main-content">
   <div id="P-inicio" class="card" style="text-align:center;">
     <div style="font-size:4rem;margin-bottom:14px;">🔬</div>
     <h2 style="font-size:1.5rem;font-weight:900;color:#0F766E;margin-bottom:8px;">¡Practicá Ciencias!</h2>
-    <p style="color:var(--texto-2);font-weight:600;font-size:.92rem;margin-bottom:24px;line-height:1.6;">Ejercicios contextualizados en la biodiversidad y naturaleza de Costa Rica, alineados al Marco DGEC 2026.</p>
+    <p style="color:var(--texto-2);font-weight:600;font-size:.92rem;margin-bottom:24px;line-height:1.6;">Ejercicios alineados a la Prueba Nacional Estandarizada <strong>Sumativa</strong> de Ciencias, Primaria 2026.</p>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:24px;text-align:left;">
-      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">🫀 Sistemas del cuerpo humano</div>
-      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">🦋 Biodiversidad y ecosistemas</div>
-      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">⚡ Tipos y fuentes de energía</div>
-      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">🌍 Tierra, sistema solar y materia</div>
+      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">🫀 Cuerpo humano</div>
+      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">🦋 Biodiversidad</div>
+      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">⚡ Energía</div>
+      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">🌎 Geofísica</div>
     </div>
-    <button onclick="iniciar()" style="background:linear-gradient(135deg,#0D9488,#0F766E);color:#fff;border:none;border-radius:14px;padding:16px 44px;font-size:1.05rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;">¡Comenzar práctica! 🚀</button>
+    <button onclick="iniciar()" style="background:linear-gradient(135deg,#0D9488,#134E4A);color:#fff;border:none;border-radius:14px;padding:16px 44px;font-size:1.05rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;">¡Comenzar práctica! 🚀</button>
   </div>
   <div id="prog-wrap" class="prog-wrap" style="display:none;">
     <span id="prog-label" class="prog-label">Ejercicio 1 de 20</span>
@@ -46,7 +46,7 @@
       <div id="enunciado" class="enunciado"></div>
       <div id="opciones" class="opciones"></div>
       <div id="pista-box" class="pista-box"><div class="pista-lbl">💡 Pista</div><div id="pista-texto"></div></div>
-      <div id="ayuda-box" class="ayuda-box"><div class="ayuda-lbl">🔬 Así se analiza</div><div id="pasos-div"></div></div>
+      <div id="ayuda-box" class="ayuda-box"><div class="ayuda-lbl">🔬 Así se explica</div><div id="pasos-div"></div></div>
       <div id="feedback" class="feedback"></div>
       <button id="btn-sig" class="btn-siguiente" onclick="siguiente()">Siguiente ejercicio →</button>
     </div>
@@ -61,9 +61,7 @@
         <div class="stat-box"><div class="sv" id="s-ay">0</div><div class="sl">Con ayuda</div></div>
         <div class="stat-box"><div class="sv" id="s-bl">0</div><div class="sl">Bloques practicados</div></div>
       </div>
-      <div class="mejoras-wrap" id="mejoras-wrap" style="display:none;">
-        <div class="mejoras-titulo">📊 Puntos a mejorar</div><div id="mejoras-lista"></div>
-      </div>
+      <div class="mejoras-wrap" id="mejoras-wrap" style="display:none;"><div class="mejoras-titulo">📊 Puntos a mejorar</div><div id="mejoras-lista"></div></div>
       <div class="res-btns">
         <button class="btn-res btn-nueva" onclick="iniciar()">🔄 Nueva sesión</button>
         <a href="primaria.html" class="btn-res btn-inicio">📚 Cambiar materia</a>
@@ -74,47 +72,52 @@
 <script>
 const CFG = {
   'Cuerpo humano': [
-    'Analiza los niveles de organización del cuerpo humano: célula, tejido, órgano, sistema y su funcionamiento integral',
-    'Analiza la función inmunológica de los componentes del tejido sanguíneo y los tipos de inmunidad',
-    'Analiza funciones e importancia de las vacunas para la prevención de enfermedades infectocontagiosas',
-    'Distingue conceptos, funciones, cuidados y hábitos saludables para los sistemas del cuerpo humano',
-    'Analiza las interrelaciones entre los sistemas del cuerpo humano para el mantenimiento de la salud'
+    'Analiza los niveles de organización del cuerpo humano: célula, tejido, órgano y sistema, y su funcionamiento integral',
+    'Analiza la función inmunológica del tejido sanguíneo: leucocitos, eritrocitos, plaquetas y los tipos de inmunidad',
+    'Analiza la función e importancia de las vacunas para la prevención de enfermedades infectocontagiosas en Costa Rica',
+    'Analiza conceptos, funciones y características de los órganos y sistemas del cuerpo humano para el mantenimiento de la salud',
+    'Analiza las interrelaciones entre los sistemas del cuerpo humano que permiten su funcionamiento integral'
   ],
   'Biodiversidad': [
-    'Reconoce conceptos de biodiversidad, adaptaciones de seres vivos, bosques, ecosistemas y áreas protegidas de Costa Rica',
-    'Clasifica organismos según unicelular/pluricelular, vertebrado/invertebrado, tipo de alimentación, respiración y reino biológico',
-    'Clasifica relaciones intraespecíficas e interespecíficas: mutualismo, comensalismo, parasitismo y depredación',
-    'Comprende el proceso de fotosíntesis: concepto, importancia y componentes iniciales y finales',
-    'Distingue los niveles de organización de los seres vivos y los componentes bióticos y abióticos de los ecosistemas'
+    'Comprende conceptos de biodiversidad: adaptaciones, funciones vitales, tipos de bosques, ecosistemas y áreas silvestres protegidas de Costa Rica',
+    'Clasifica organismos según unicelulares/pluricelulares, vertebrados/invertebrados, tipos de alimentación, reproducción y reino biológico',
+    'Clasifica relaciones de interdependencia intraespecíficas e interespecíficas: mutualismo, comensalismo, parasitismo y depredación',
+    'Comprende el proceso de fotosíntesis: concepto, importancia, componentes iniciales y finales',
+    'Distingue niveles de organización de los seres vivos: biosfera, ecosistema, comunidad, población e individuo; componentes bióticos y abióticos'
   ],
   'Energía': [
-    'Clasifica la energía por tipos (cinética y potencial), clases (geotérmica, eólica, solar, eléctrica, nuclear), fuentes y transformaciones',
-    'Distingue las manifestaciones de la energía: movimiento, calor, luz y sonido en situaciones cotidianas de Costa Rica',
-    'Determina características de electricidad, magnetismo, circuitos eléctricos, conductividad y corriente eléctrica'
+    'Clasifica la energía por sus tipos (cinética y potencial), clases, fuentes, transformaciones y aplicaciones en el entorno',
+    'Distingue fuentes de energía limpia y contaminante; reconoce transformaciones entre clases de energía en situaciones cotidianas',
+    'Distingue las manifestaciones de la energía: movimiento, calor (conducción, radiación, convección), luz y sonido en situaciones cotidianas',
+    'Determina características de electricidad, magnetismo, corriente eléctrica, circuitos en serie y paralelo, y conductividad'
   ],
   'Geofísica': [
-    'Distingue la estructura interna y externa del planeta Tierra: geosfera, atmósfera e hidrosfera, y los agentes que las modifican',
-    'Clasifica movimientos de la Tierra y la Luna y sus efectos: eclipses, fases lunares, mareas y estaciones del año',
-    'Distingue componentes del sistema solar, el universo y los aportes tecnológicos de la exploración espacial',
-    'Comprende los cambios físicos y químicos de la materia, sustancias puras y mezclas, métodos de separación',
-    'Identifica evidencias de evolución del planeta Tierra, eras geológicas y fósiles como evidencia de vida pasada'
+    'Distingue la estructura interna y externa del planeta Tierra: geosfera, atmósfera, hidrosfera y los agentes que los modifican',
+    'Clasifica los movimientos de la Tierra y la Luna y sus efectos: eclipses, fases de la luna, estaciones del año y mareas',
+    'Distingue los componentes del Sistema Solar y el universo; reconoce aportes científico-tecnológicos de la exploración espacial',
+    'Comprende los cambios físicos y químicos de la materia: oxidación, combustión; sustancias puras, mezclas y métodos de separación',
+    'Comprende las evidencias de la evolución del planeta Tierra, las eras geológicas y las teorías del origen del universo'
   ]
 };
 const BLOQUES = Object.keys(CFG);
-const REC = { 'Cuerpo humano':'Repasá los sistemas del cuerpo, la función inmunológica y las vacunas.','Biodiversidad':'Estudiá ecosistemas, relaciones entre seres vivos y el proceso de fotosíntesis.','Energía':'Repasá tipos de energía, electricidad y manifestaciones energéticas cotidianas.','Geofísica':'Estudiá la estructura de la Tierra, movimientos y el sistema solar.' };
+const REC = {
+  'Cuerpo humano':  'Repasá los sistemas del cuerpo, la función inmunológica y la importancia de las vacunas.',
+  'Biodiversidad':  'Revisá clasificación de seres vivos, relaciones ecológicas y fotosíntesis en ecosistemas costarricenses.',
+  'Energía':        'Reforzá tipos de energía, transformaciones, circuitos eléctricos y manifestaciones de la energía.',
+  'Geofísica':      'Trabajá estructura de la Tierra, movimientos planetarios, cambios de la materia y evolución del planeta.'
+};
 const TOTAL = 20;
 let E = {};
 function resetE(){ E={idx:0,intentos:0,corrPrimer:0,conAyuda:0,bloques:new Set(),data:null,bloqueActual:'',historial:[]}; }
 function iniciar(){ resetE(); document.getElementById('P-inicio').style.display='none'; document.getElementById('P-resumen').style.display='none'; document.getElementById('prog-wrap').style.display='flex'; document.getElementById('card-ejercicio').style.display='block'; generar(); }
 function mostrarResumen(){ document.getElementById('prog-wrap').style.display='none'; document.getElementById('card-ejercicio').style.display='none'; document.getElementById('P-resumen').style.display='block'; const pct=Math.round((E.corrPrimer/TOTAL)*100); let trofeo,titulo,color; if(pct>=90){trofeo='🏆';titulo='¡Resultado sobresaliente!';color='#065F46';}else if(pct>=80){trofeo='🥇';titulo='¡Muy buen desempeño!';color='#065F46';}else if(pct>=70){trofeo='🥈';titulo='¡Buen trabajo!';color='#1E40AF';}else if(pct>=60){trofeo='🥉';titulo='Hay áreas por reforzar';color='#92400E';}else{trofeo='💪';titulo='¡Seguí practicando!';color='#991B1B';} document.getElementById('trophy').textContent=trofeo; document.getElementById('res-titulo').textContent=titulo; document.getElementById('nota-valor').textContent=pct+'%'; document.getElementById('nota-valor').style.color=color; document.getElementById('nota-label').textContent=pct>=90?'Excelente':pct>=80?'Muy bueno':pct>=70?'Bueno':pct>=60?'Regular':'Necesita refuerzo'; document.getElementById('s-cor').textContent=E.corrPrimer; document.getElementById('s-ay').textContent=E.conAyuda; document.getElementById('s-bl').textContent=E.bloques.size; const bf={}; E.historial.forEach(h=>{if(!bf[h.bloque])bf[h.bloque]={ok:0,total:0};bf[h.bloque].total++;if(h.ok)bf[h.bloque].ok++;}); const div=document.getElementById('mejoras-lista');div.innerHTML='';let hay=false; Object.entries(bf).forEach(([bl,d])=>{const p=Math.round((d.ok/d.total)*100);if(p<80){hay=true;div.innerHTML+=`<div class="mejora-item"><div class="mejora-bloque">📌 ${bl} — ${p}% de logro</div><div class="mejora-rec">${REC[bl]||'Repasá los contenidos de este bloque.'}</div></div>`;}}); if(!hay)div.innerHTML='<div style="color:#065F46;font-weight:700;text-align:center;padding:12px;">✅ ¡Excelente desempeño en todos los bloques!</div>'; document.getElementById('mejoras-wrap').style.display='block'; if(pct>=80)confetti(); }
 function actualizarProg(){ document.getElementById('prog-label').textContent=`Ejercicio ${E.idx+1} de ${TOTAL}`; document.getElementById('prog-fill').style.width=`${(E.idx/TOTAL)*100}%`; const h=document.getElementById('hearts');h.innerHTML=''; for(let i=0;i<3;i++){const s=document.createElement('span');s.textContent=i<(3-E.intentos)?'❤️':'🖤';h.appendChild(s);} }
-async function generar(){ const bn=BLOQUES[E.idx%BLOQUES.length]; const afs=CFG[bn]; const af=afs[Math.floor(Math.random()*afs.length)]; E.bloques.add(bn); E.bloqueActual=bn; E.intentos=0; document.getElementById('bloque-pill').textContent=bn; document.getElementById('loader').style.display='flex'; document.getElementById('contenido').style.display='none'; document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); actualizarProg(); try{ const res=await fetch('/api/generar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({materia:'cien',bloque:bn,afirmacion:af})}); if(!res.ok){const e=await res.json();throw new Error(e.error||'Error del servidor');} E.data=await res.json(); mostrar(); }catch(err){ document.getElementById('loader-msg').textContent='⚠️ '+err.message+'. Reintentando...'; setTimeout(generar,3000); } }
+async function generar(){ const bn=BLOQUES[E.idx%BLOQUES.length]; const afs=CFG[bn]; const af=afs[Math.floor(Math.random()*afs.length)]; E.bloques.add(bn); E.bloqueActual=bn; E.intentos=0; document.getElementById('bloque-pill').textContent=bn; document.getElementById('loader').style.display='flex'; document.getElementById('contenido').style.display='none'; document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); actualizarProg(); try{ const res=await fetch('/api/generar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({materia:'cien-sum',bloque:bn,afirmacion:af,nivel:'primaria-sumativa'})}); if(!res.ok){const e=await res.json();throw new Error(e.error||'Error del servidor');} E.data=await res.json(); mostrar(); }catch(err){ document.getElementById('loader-msg').textContent='⚠️ '+err.message+'. Reintentando...'; setTimeout(generar,3000); } }
 function mostrar(){ document.getElementById('loader').style.display='none'; document.getElementById('contenido').style.display='block'; const d=E.data; const cb=document.getElementById('ctx-box'); if(d.contexto_situacional?.trim()){cb.textContent=d.contexto_situacional;cb.style.display='block';}else cb.style.display='none'; document.getElementById('enunciado').textContent=d.enunciado; const op=document.getElementById('opciones');op.innerHTML=''; ['A','B','C','D'].forEach(l=>{const b=document.createElement('button');b.className='opcion';b.innerHTML=`<span class="letra">${l}</span><span>${d.opciones[l]}</span>`;b.onclick=()=>responder(l);op.appendChild(b);}); }
-function responder(sel){ const d=E.data,ok=sel===d.clave; E.intentos++; const bots=document.querySelectorAll('.opcion'); const fb=document.getElementById('feedback'); if(ok){ bots.forEach(b=>{const l=b.querySelector('.letra').textContent;if(l===sel)b.classList.add('correcta');else b.setAttribute('disabled','');}); if(E.intentos===1){E.corrPrimer++;E.historial.push({bloque:E.bloqueActual,ok:true});fb.className='feedback ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}else if(E.intentos===2){E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}else{E.conAyuda++;E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback warn';fb.textContent='👍 Correcto. Repasá el análisis del ejercicio.';} document.getElementById('btn-sig').classList.add('vis'); }else{ bots.forEach(b=>{if(b.querySelector('.letra').textContent===sel)b.classList.add('incorrecta');}); if(E.intentos===1){fb.className='feedback err';fb.textContent='❌ No es correcta. Revisá la pista e intentá de nuevo.';document.getElementById('pista-texto').textContent=d.pista;document.getElementById('pista-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);}else if(E.intentos===2){fb.className='feedback err';fb.textContent='❌ Casi. Veamos cómo analizar este ejercicio:';const pd=document.getElementById('pasos-div');pd.innerHTML='';d.pasos_resolucion.forEach((p,i)=>{pd.innerHTML+=`<div class="paso"><div class="num">${i+1}</div><p><strong>${p.titulo}:</strong> ${p.explicacion}</p></div>`;});document.getElementById('ayuda-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);} actualizarProg(); } }
+function responder(sel){ const d=E.data,ok=sel===d.clave; E.intentos++; const bots=document.querySelectorAll('.opcion'); const fb=document.getElementById('feedback'); if(ok){ bots.forEach(b=>{const l=b.querySelector('.letra').textContent;if(l===sel)b.classList.add('correcta');else b.setAttribute('disabled','');}); if(E.intentos===1){E.corrPrimer++;E.historial.push({bloque:E.bloqueActual,ok:true});fb.className='feedback ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}else if(E.intentos===2){E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}else{E.conAyuda++;E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback warn';fb.textContent='👍 Correcto. Repasá los contenidos.';} document.getElementById('btn-sig').classList.add('vis'); }else{ bots.forEach(b=>{if(b.querySelector('.letra').textContent===sel)b.classList.add('incorrecta');}); if(E.intentos===1){fb.className='feedback err';fb.textContent='❌ No es correcta. Revisá la pista e intentá de nuevo.';document.getElementById('pista-texto').textContent=d.pista;document.getElementById('pista-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);}else if(E.intentos===2){fb.className='feedback err';fb.textContent='❌ Casi. Veamos la explicación:';const pd=document.getElementById('pasos-div');pd.innerHTML='';d.pasos_resolucion.forEach((p,i)=>{pd.innerHTML+=`<div class="paso"><div class="num">${i+1}</div><p><strong>${p.titulo}:</strong> ${p.explicacion}</p></div>`;});document.getElementById('ayuda-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);} actualizarProg(); } }
 function siguiente(){ E.idx++; if(E.idx>=TOTAL){mostrarResumen();return;} document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); generar(); }
-function confetti(){ const col=['#0D9488','#F59E0B','#10B981','#0EA5E9','#EF4444']; for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti-p';Object.assign(d.style,{top:'-10px',left:Math.random()*100+'vw',width:(Math.random()*9+5)+'px',height:(Math.random()*9+5)+'px',borderRadius:Math.random()>.5?'50%':'2px',background:col[Math.floor(Math.random()*col.length)],animationDelay:(Math.random()*.6)+'s',animationDuration:(Math.random()*.8+1.4)+'s'});document.body.appendChild(d);setTimeout(()=>d.remove(),2800);} }
+function confetti(){ const col=['#0D9488','#F59E0B','#0EA5E9','#10B981','#EF4444']; for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti-p';Object.assign(d.style,{top:'-10px',left:Math.random()*100+'vw',width:(Math.random()*9+5)+'px',height:(Math.random()*9+5)+'px',borderRadius:Math.random()>.5?'50%':'2px',background:col[Math.floor(Math.random()*col.length)],animationDelay:(Math.random()*.6)+'s',animationDuration:(Math.random()*.8+1.4)+'s'});document.body.appendChild(d);setTimeout(()=>d.remove(),2800);} }
 </script>
-
 <footer style="width:100%;text-align:center;padding:18px 0 28px;font-family:'Nunito',sans-serif;font-size:.95rem;color:#94A3B8;font-weight:600;letter-spacing:.3px;">Diseñado por <strong style="color:#1B3A6B;">Eduardo Romero C.</strong> · SDBHS · DGEC 2026</footer>
 </body>
 </html>
