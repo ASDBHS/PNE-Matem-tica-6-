@@ -97,5 +97,7 @@ function responder(sel){ const d=E.data,ok=sel===d.clave; E.intentos++; const bo
 function siguiente(){ E.idx++; if(E.idx>=TOTAL){mostrarResumen();return;} document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); generar(); }
 function confetti(){ const col=['#7C3AED','#F59E0B','#10B981','#EC4899','#EF4444']; for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti-p';Object.assign(d.style,{top:'-10px',left:Math.random()*100+'vw',width:(Math.random()*9+5)+'px',height:(Math.random()*9+5)+'px',borderRadius:Math.random()>.5?'50%':'2px',background:col[Math.floor(Math.random()*col.length)],animationDelay:(Math.random()*.6)+'s',animationDuration:(Math.random()*.8+1.4)+'s'});document.body.appendChild(d);setTimeout(()=>d.remove(),2800);} }
 </script>
+
+<footer style="width:100%;text-align:center;padding:18px 0 28px;font-family:'Nunito',sans-serif;font-size:.95rem;color:#94A3B8;font-weight:600;letter-spacing:.3px;">Diseñado por <strong style="color:#1B3A6B;">Eduardo Romero C.</strong> · SDBHS · DGEC 2026</footer>
 </body>
 </html>
