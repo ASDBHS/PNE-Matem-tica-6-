@@ -58,8 +58,7 @@ async function llamarGroq(apiKey, prompt) {
       'Authorization': 'Bearer ' + apiKey
     },
     body: JSON.stringify({
-      // ¡CORREGIDO! Cambiado al modelo activo Llama 3.1 8B Instant para evitar la obsolescencia de Mixtral.
-      model: 'llama-3.1-8b-instant', 
+      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
       max_tokens: 1500,
       temperature: 0.85,
       response_format: { type: 'json_object' },
@@ -77,13 +76,29 @@ async function llamarGroq(apiKey, prompt) {
   const ejercicio = JSON.parse(texto.substring(ini, fin + 1));
   if (!ejercicio.enunciado || !ejercicio.opciones || !ejercicio.clave) throw new Error('JSON incompleto');
 
-  // Sanitizar pasos_resolucion
+  // Sanitizar opciones — algunos modelos devuelven array en vez de objeto {A,B,C,D}
+  if (Array.isArray(ejercicio.opciones)) {
+    var letras = ['A','B','C','D'];
+    var opObj = {};
+    ejercicio.opciones.forEach(function(val, i) {
+      if (i < 4) opObj[letras[i]] = String(val);
+    });
+    ejercicio.opciones = opObj;
+  }
+  // Garantizar que las 4 letras existan
+  ['A','B','C','D'].forEach(function(l) {
+    if (!ejercicio.opciones[l] || ejercicio.opciones[l] === 'undefined') {
+      ejercicio.opciones[l] = 'Opción ' + l;
+    }
+  });
+
+  // Sanitizar pasos_resolucion — Groq a veces devuelve campos con nombres distintos o arrays cortos
   if (!Array.isArray(ejercicio.pasos_resolucion)) {
     ejercicio.pasos_resolucion = [];
   }
   ejercicio.pasos_resolucion = ejercicio.pasos_resolucion.map(function(p) {
     return {
-      titulo:      p.titulo      || p.paso        || p.title       || p.nombre    || 'Paso',
+      titulo:      p.titulo      || p.paso        || p.title       || p.nombre   || 'Paso',
       explicacion: p.explicacion || p.descripcion || p.explanation || p.detalle  || p.contenido || p.texto || ''
     };
   });
@@ -122,7 +137,7 @@ function crearEjercicioMat() {
       enunciado: '¿Cuántas piñas le faltaron a la cooperativa para poder llenar una caja más y aumentar en uno el total de cajas exportadas?',
       correcta: falta + ' piñas',
       d: [d1 + ' piñas', d2 + ' piñas', d3 + ' piñas'],
-      pista: 'Calculá cuántas cajas completas se llenaron and cuántas piñas sobraron. Luego: ¿cuántas faltarían para completar la siguiente caja?',
+      pista: 'Calculá cuántas cajas completas se llenaron y cuántas piñas sobraron. Luego: ¿cuántas faltarían para completar la siguiente caja?',
       pasos: [
         {titulo:'Dividir para encontrar cajas y sobrante', explicacion: total + ' ÷ ' + div + ' = ' + cociente + ' cajas completas, con ' + resto + ' piñas sobrantes.'},
         {titulo:'Analizar la caja incompleta', explicacion: 'La caja siguiente necesita ' + div + ' piñas pero solo hay ' + resto + '. Le faltan ' + div + ' - ' + resto + ' = ' + falta + ' piñas.'},
@@ -342,7 +357,7 @@ const PROMPTS = {
   },
 
   'ss-sum': function(b, a) {
-    return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada SUMATIVA de Estudios Sociales 2026, primaria costarricense.\n\nBLOQUE: ' + b + '\nAFIRMACIÓN/EVIDENCIA: ' + a + '\n\nREGLAS OBLIGATORIAS:\n1. CONTEXTO COSTARRICENSE CONCRETO: el contexto_situacional debe presentar una situación, fuente histórica breve, dato geográfico o escenario ciudadano CONCRETO de Costa Rica directamente relacionado con la afirmación (ej: texto sobre la Campaña Nacional, descripción de una región geográfica, caso de participación ciudadana).\n2. COHERENCIA TOTAL: el contexto y la pregunta deben hablar del MISMO tema. Si la afirmación es sobre la Anexión del Partido de Nicoya, el contexto y la pregunta tratan ese evento.\n3. ANÁLISIS E INFERENCIA: la pregunta pide analizar, comparar, inferir consecuencias o distinguir efectos — NUNCA solo recordar fechas o nombres.\n4. DISTRACTORES PLAUSIBLES: respuestas o confusiones históricas/geográficas comunes de estudiantes de primaria costarricense.\n5. VERIFICÁ que la clave sea históricamente correcta.\n6. La clave NO debe ser siempre A — variá la posición.\n\n' + JSON_SCHEMA;
+    return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada SUMATIVA de Estudios Sociales 2026, primaria costarricense.\n\nBLOQUE: ' + b + '\nAFIRMACIÓN/EVIDENCIA: ' + a + '\n\nREGLAS OBLIGATORIAS:\n1. CONTEXTO COSTARRICENSE CONCRETO: el contexto_situacional debe presentar una situación, fuente histórica breve, dato geográfico o escenario ciudadano CONCRETO de Costa Rica directamente relacionado con la afirmación (ej: texto sobre la Campaña Nacional, descripción de una región geográfica, caso de participación ciudadana).\n2. COHERENCIA TOTAL: el contexto y la pregunta deben hablar del MISMO tema. Si la afirmación es sobre la Anexión del Partido de Nicoya, el contexto y la pregunta tratan ese evento.\n3. ANÁLISIS E INFERENCIA: la pregunta pide analizar, comparar, inferir consecuencias o distinguir efectos — NUNCA solo recordar fechas o nombres.\n4. DISTRACTORES PLAUSIBLES: confusiones históricas o geográficas comunes de estudiantes de primaria costarricense.\n5. VERIFICÁ que la clave sea históricamente correcta.\n6. La clave NO debe ser siempre A — variá la posición.\n\n' + JSON_SCHEMA;
   }
 
 };
@@ -367,47 +382,35 @@ module.exports = async function handler(req, res) {
     // ── MATEMÁTICAS PRIMARIA (plantillas exactas, sin IA) ────
     if (materia === 'mat') {
       const ej = crearEjercicioMat();
-      const opcionesIniciales = { A: ej.correcta, B: ej.d[0], C: ej.d[1], D: ej.d[2] };
-      const garantizadas = garantizarUnicas(opcionesIniciales);
-      const { opciones, clave } = mezclar(garantizadas, 'A');
-
+      const rawOps  = { A: ej.correcta, B: ej.d[0], C: ej.d[1], D: ej.d[2] };
+      const unique  = garantizarUnicas(rawOps);
+      const mixed   = mezclar(unique, 'A');
       return res.status(200).json({
         contexto_situacional: ej.ctx,
-        enunciado: ej.enunciado,
-        opciones: opciones,
-        clave: clave,
-        pista: ej.pista,
-        pasos_resolucion: ej.pasos
+        enunciado:            ej.enunciado,
+        opciones:             mixed.opciones,
+        clave:                mixed.clave,
+        pista:                ej.pista,
+        pasos_resolucion:     ej.pasos
       });
-    } 
-    // ── RESTO DE MATERIAS (generación con IA de Groq) ────
-    else {
-      const apiKey = process.env.GROQ_API_KEY; 
-      if (!apiKey) {
-        throw new Error('Falta la variable de entorno GROQ_API_KEY en Vercel');
-      }
-
-      const generarPrompt = PROMPTS[materia];
-      if (!generarPrompt) {
-        throw new Error('Materia no soportada o prompt no definido: ' + materia);
-      }
-
-      const promptCompleto = generarPrompt(bloque, afirmacion);
-      
-      // Llamada a la API de Groq usando Llama 3.1 8B
-      const ejercicioIA = await llamarGroq(apiKey, promptCompleto);
-
-      // Mezclar y garantizar opciones únicas
-      const garantizadas = garantizarUnicas(ejercicioIA.opciones);
-      const { opciones, clave } = mezclar(garantizadas, ejercicioIA.clave);
-      
-      ejercicioIA.opciones = opciones;
-      ejercicioIA.clave = clave;
-
-      return res.status(200).json(ejercicioIA);
     }
-  } catch (error) {
-    console.error('Error en TutoríaPRO:', error);
-    return res.status(500).json({ error: error.message });
+
+    // ── TODAS LAS DEMÁS MATERIAS (IA vía Groq) ───────────────
+    const promptFn = PROMPTS[materia];
+    if (!promptFn) return res.status(400).json({ error: 'Materia no reconocida: ' + materia });
+
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey)  return res.status(500).json({ error: 'GROQ_API_KEY no configurada' });
+
+    const ejercicio = await llamarGroq(apiKey, promptFn(bloque, afirmacion));
+    const mixed     = mezclar(ejercicio.opciones, ejercicio.clave);
+    ejercicio.opciones = mixed.opciones;
+    ejercicio.clave    = mixed.clave;
+
+    return res.status(200).json(ejercicio);
+
+  } catch (err) {
+    console.error('[/api/generar] materia=' + materia + ':', err.message);
+    return res.status(500).json({ error: err.message || 'Error interno' });
   }
 };
