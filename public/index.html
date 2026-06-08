@@ -3,47 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TutoríaPRO · 6° Grado · SDBHS</title>
+<title>TutoríaPRO · SDBHS</title>
 <link rel="stylesheet" href="style.css">
+<style>
+.nivel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 8px;
+}
+@media(max-width:580px){ .nivel-grid { grid-template-columns: 1fr; } }
+.nivel-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 20px;
+  border-radius: 18px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: 'Nunito', sans-serif;
+  transition: transform .18s, box-shadow .18s;
+  box-shadow: 0 4px 18px rgba(0,0,0,.10);
+}
+.nivel-card:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(0,0,0,.16); }
+.nivel-primaria { background: linear-gradient(135deg,#1B3A6B,#2563EB); color: #fff; }
+.nivel-secundaria { background: linear-gradient(135deg,#5B21B6,#7C3AED); color: #fff; }
+.nivel-icon { font-size: 3.2rem; }
+.nivel-titulo { font-size: 1.22rem; font-weight: 900; letter-spacing: .2px; }
+.nivel-sub { font-size: .82rem; font-weight: 600; opacity: .85; text-align: center; line-height: 1.5; }
+.nivel-badge {
+  background: rgba(255,255,255,.22);
+  border-radius: 30px;
+  padding: 3px 12px;
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .4px;
+  margin-top: 2px;
+}
+</style>
 </head>
 <body>
 <header>
   <span class="logo">📚</span>
-  <div class="info"><h1>TutoríaPRO</h1><p>Práctica adaptativa · 6° Grado · SDBHS</p></div>
+  <div class="info"><h1>TutoríaPRO</h1><p>Práctica adaptativa · SDBHS · PNE 2026</p></div>
   <span class="badge">DGEC 2026</span>
 </header>
 <main>
   <div class="card">
     <div class="dashboard-hero">
       <span class="hero-icon">🎯</span>
-      <h2>¿Qué materia querés practicar hoy?</h2>
+      <h2>Seleccioná tu nivel</h2>
       <p>Ejercicios generados por IA, alineados al Marco de Especificaciones DGEC 2026. Cada sesión es completamente diferente — practicá cuantas veces quieras.</p>
     </div>
-    <div class="materias-grid">
-      <a href="matematicas.html" class="materia-card mc-mat">
-        <span class="mc-icon">🧮</span>
-        <h3>Matemáticas</h3>
-        <p>Números, Geometría, Medidas, Álgebra y Estadística</p>
+    <div class="nivel-grid">
+      <a href="primaria.html" class="nivel-card nivel-primaria">
+        <span class="nivel-icon">🏫</span>
+        <div class="nivel-titulo">PNE Primaria</div>
+        <div class="nivel-sub">Matemáticas, Español,<br>Ciencias y Estudios Sociales</div>
+        <div class="nivel-badge">6° Grado · Diagnóstica</div>
       </a>
-      <a href="espanol.html" class="materia-card mc-esp">
-        <span class="mc-icon">📖</span>
-        <h3>Español</h3>
-        <p>Comprensión lectora, textos literarios y no literarios</p>
-      </a>
-      <a href="ciencias.html" class="materia-card mc-cien">
-        <span class="mc-icon">🔬</span>
-        <h3>Ciencias</h3>
-        <p>Cuerpo humano, Biodiversidad, Energía y Geofísica</p>
-      </a>
-      <a href="sociales.html" class="materia-card mc-ss">
-        <span class="mc-icon">🌍</span>
-        <h3>Estudios Sociales</h3>
-        <p>Geografía, Historia y Ciudadanía costarricense</p>
+      <a href="secundaria.html" class="nivel-card nivel-secundaria">
+        <span class="nivel-icon">🎓</span>
+        <div class="nivel-titulo">PNE Secundaria</div>
+        <div class="nivel-sub">Matemáticas, Español, Ciencias,<br>Sociales y Ed. Cívica</div>
+        <div class="nivel-badge">11° Año · Sumativa</div>
       </a>
     </div>
   </div>
 </main>
-
 <footer style="width:100%;text-align:center;padding:18px 0 28px;font-family:'Nunito',sans-serif;font-size:.95rem;color:#94A3B8;font-weight:600;letter-spacing:.3px;">Diseñado por <strong style="color:#1B3A6B;">Eduardo Romero C.</strong> · SDBHS · DGEC 2026</footer>
 </body>
 </html>
