@@ -58,8 +58,8 @@ async function llamarGroq(apiKey, prompt) {
       'Authorization': 'Bearer ' + apiKey
     },
     body: JSON.stringify({
-      // ¡INTEGRADO! Se cambió al modelo Mixtral para evitar el límite de rango diario.
-      model: 'mixtral-8x7b-32768', 
+      // ¡CORREGIDO! Cambiado al modelo activo Llama 3.1 8B Instant para evitar la obsolescencia de Mixtral.
+      model: 'llama-3.1-8b-instant', 
       max_tokens: 1500,
       temperature: 0.85,
       response_format: { type: 'json_object' },
@@ -122,7 +122,7 @@ function crearEjercicioMat() {
       enunciado: '¿Cuántas piñas le faltaron a la cooperativa para poder llenar una caja más y aumentar en uno el total de cajas exportadas?',
       correcta: falta + ' piñas',
       d: [d1 + ' piñas', d2 + ' piñas', d3 + ' piñas'],
-      pista: 'Calculá cuántas cajas completas se llenaron y cuántas piñas sobraron. Luego: ¿cuántas faltarían para completar la siguiente caja?',
+      pista: 'Calculá cuántas cajas completas se llenaron and cuántas piñas sobraron. Luego: ¿cuántas faltarían para completar la siguiente caja?',
       pasos: [
         {titulo:'Dividir para encontrar cajas y sobrante', explicacion: total + ' ÷ ' + div + ' = ' + cociente + ' cajas completas, con ' + resto + ' piñas sobrantes.'},
         {titulo:'Analizar la caja incompleta', explicacion: 'La caja siguiente necesita ' + div + ' piñas pero solo hay ' + resto + '. Le faltan ' + div + ' - ' + resto + ' = ' + falta + ' piñas.'},
@@ -318,7 +318,7 @@ const PROMPTS = {
   },
 
   'sec-ss': function(b, a) {
-    return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada SUMATIVA de Estudios Sociales 2026, 11° año, secundaria costarricense.\n\nBLOQUE: ' + b + '\nAFIRMACIÓN/EVIDENCIA: ' + a + '\n\nREGLAS OBLIGATORIAS:\n1. CONTEXTO TEXTUAL CONCRETO: usá siempre una fuente concreta — cita histórica, estadística, mapa descrito, noticia o caso real directamente relacionado con el bloque. El estudiante debe analizar ese contexto para responder.\n2. ANÁLISIS E INFERENCIA: la pregunta pide analizar causas, consecuencias, comparar procesos o inferir implicaciones — nunca solo reconocer un dato memorístico.\n3. PERTINENCIA COSTARRICENSE: para bloques sobre Costa Rica, relacioná con impacto en la vida cotidiana actual. Para bloques mundiales, usá examples con relevancia para el contexto latinoamericano.\n4. DISTRACTORES PLAUSIBLES: respuestas históricamente posibles pero incorrectas para el contexto específico planteado.\n5. La clave NO debe ser siempre A — variá la posición.\n\n' + JSON_SCHEMA;
+    return 'Eres un evaluador experto del MEP de Costa Rica. Generá un ítem de selección única para la Prueba Nacional Estandarizada SUMATIVA de Estudios Sociales 2026, 11° año, secundaria costarricense.\n\nBLOQUE: ' + b + '\nAFIRMACIÓN/EVIDENCIA: ' + a + '\n\nREGLAS OBLIGATORIAS:\n1. CONTEXTO TEXTUAL CONCRETO: usá siempre una fuente concreta — cita histórica, estadística, mapa descrito, noticia o caso real directamente relacionado con el bloque. El estudiante debe analizar ese contexto para responder.\n2. ANÁLISIS E INFERENCIA: la pregunta pide analizar causas, consecuencias, comparar procesos o inferir implicaciones — nunca solo reconocer un dato memorístico.\n3. PERTINENCIA COSTARRICENSE: para bloques sobre Costa Rica, relacioná con impacto en la vida cotidiana actual. Para bloques mundiales, usá ejemplos con relevancia para el contexto latinoamericano.\n4. DISTRACTORES PLAUSIBLES: respuestas históricamente posibles pero incorrectas para el contexto específico planteado.\n5. La clave NO debe ser siempre A — variá la posición.\n\n' + JSON_SCHEMA;
   },
 
   'sec-civ': function(b, a) {
@@ -394,7 +394,7 @@ module.exports = async function handler(req, res) {
 
       const promptCompleto = generarPrompt(bloque, afirmacion);
       
-      // Llamada a la API de Groq usando Mixtral
+      // Llamada a la API de Groq usando Llama 3.1 8B
       const ejercicioIA = await llamarGroq(apiKey, promptCompleto);
 
       // Mezclar y garantizar opciones únicas
