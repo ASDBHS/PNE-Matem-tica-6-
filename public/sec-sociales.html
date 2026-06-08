@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudios Sociales Sec · TutoríaPRO</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .prog-fill    { background: linear-gradient(90deg,#B45309,#D97706); }
+  .bloque-pill  { background: #FEF3C7; color: #92400E; }
+  .ctx-box      { background: #FFFBEB; color: #78350F; border-color: #B45309; }
+  .btn-siguiente{ background: #B45309; }
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">🌐</span>
+  <div class="info"><h1>SocialesPRO</h1><p>Estudios Sociales · 11° Año · SDBHS</p></div>
+  <button class="back-btn" onclick="location.href='secundaria.html'">← Inicio</button>
+  <span class="badge">DGEC 2026</span>
+</header>
+<main id="main-content">
+  <div id="P-inicio" class="card" style="text-align:center;">
+    <div style="font-size:4rem;margin-bottom:14px;">🌐</div>
+    <h2 style="font-size:1.5rem;font-weight:900;color:#92400E;margin-bottom:8px;">¡Practicá Estudios Sociales!</h2>
+    <p style="color:var(--texto-2);font-weight:600;font-size:.92rem;margin-bottom:24px;line-height:1.6;">Ejercicios de análisis histórico, geopolítico y ciudadano alineados a la Prueba Nacional Estandarizada Sumativa 2026. Énfasis en el análisis de contextos y fuentes.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:24px;text-align:left;">
+      <div style="background:#FEF3C7;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#92400E;">🌍 Historia mundial s. XIX-XX</div>
+      <div style="background:#FEF3C7;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#92400E;">🇨🇷 Costa Rica contemporánea</div>
+      <div style="background:#FEF3C7;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#92400E;">🗺️ Geopolítica y globalización</div>
+      <div style="background:#FEF3C7;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#92400E;">👥 Demografía y migración</div>
+    </div>
+    <button onclick="iniciar()" style="background:linear-gradient(135deg,#B45309,#78350F);color:#fff;border:none;border-radius:14px;padding:16px 44px;font-size:1.05rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;">¡Comenzar práctica! 🚀</button>
+  </div>
+  <div id="prog-wrap" class="prog-wrap" style="display:none;">
+    <span id="prog-label" class="prog-label">Ejercicio 1 de 20</span>
+    <div class="prog-track"><div id="prog-fill" class="prog-fill" style="width:0%"></div></div>
+    <div id="hearts" class="hearts"></div>
+    <span id="bloque-pill" class="bloque-pill">—</span>
+  </div>
+  <div id="card-ejercicio" class="card" style="display:none;">
+    <div id="loader" class="loader"><div class="spinner"></div><p id="loader-msg">Generando ejercicio...</p></div>
+    <div id="contenido" style="display:none;">
+      <div id="ctx-box" class="ctx-box" style="display:none;"></div>
+      <div id="enunciado" class="enunciado"></div>
+      <div id="opciones" class="opciones"></div>
+      <div id="pista-box" class="pista-box"><div class="pista-lbl">💡 Pista</div><div id="pista-texto"></div></div>
+      <div id="ayuda-box" class="ayuda-box"><div class="ayuda-lbl">📚 Análisis del contexto</div><div id="pasos-div"></div></div>
+      <div id="feedback" class="feedback"></div>
+      <button id="btn-sig" class="btn-siguiente" onclick="siguiente()">Siguiente ejercicio →</button>
+    </div>
+  </div>
+  <div id="P-resumen" class="card" style="display:none;">
+    <div class="resumen">
+      <span class="trophy" id="trophy">🏆</span>
+      <h2 id="res-titulo">¡Sesión completada!</h2>
+      <div class="nota-wrap"><div class="nota-valor" id="nota-valor">—</div><div class="nota-label" id="nota-label">—</div></div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="sv" id="s-cor">0</div><div class="sl">Al primer intento</div></div>
+        <div class="stat-box"><div class="sv" id="s-ay">0</div><div class="sl">Con ayuda</div></div>
+        <div class="stat-box"><div class="sv" id="s-bl">0</div><div class="sl">Bloques practicados</div></div>
+      </div>
+      <div class="mejoras-wrap" id="mejoras-wrap" style="display:none;"><div class="mejoras-titulo">📊 Puntos a mejorar</div><div id="mejoras-lista"></div></div>
+      <div class="res-btns">
+        <button class="btn-res btn-nueva" onclick="iniciar()">🔄 Nueva sesión</button>
+        <a href="secundaria.html" class="btn-res btn-inicio">📚 Cambiar materia</a>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const CFG = {
+  'Historia Mundial s. XIX-XX': [
+    'Distingue el proceso de expansión de los imperios europeos y su capacidad para controlar y modificar las condiciones de vida en las colonias durante los siglos XIX e inicios del XX',
+    'Comprende el impacto en la estructura social, económica, política y cotidiana de las sociedades que vivieron las guerras mundiales durante la primera mitad del siglo XX',
+    'Analiza los cambios propiciados por la Revolución rusa en el escenario geopolítico mundial y en su población durante la primera mitad del siglo XX',
+    'Reconoce los efectos de las crisis económicas del modelo capitalista como la depresión de los años treinta en la cotidianidad y la estructura social',
+    'Distingue las razones políticas, económicas, sociales e ideológicas que impulsaron las dos guerras mundiales durante la primera mitad del siglo XX',
+    'Reconoce las implicaciones sociales y políticas de la persecución y exterminio de grupos étnicos durante la Segunda Guerra Mundial'
+  ],
+  'Guerra Fría y Mundo Contemporáneo': [
+    'Identifica los motivos que propiciaron el desarrollo del conflicto denominado Guerra Fría en la segunda mitad del siglo XX',
+    'Analiza la rivalidad geopolítica entre EE.UU. y la URSS expresada a través de propaganda, carrera armamentista y exploración espacial',
+    'Distingue la importancia de los procesos de descolonización en Asia y África y su impacto para los pueblos en la actualidad',
+    'Analiza las repercusiones en la vida cotidiana y política de la violación de derechos humanos en el contexto de la Guerra Fría en América Latina',
+    'Analiza los cambios que produjo el colapso del socialismo real a finales del siglo XX en la sociedad internacional',
+    'Reconoce el efecto de los conflictos geopolíticos actuales: China, Corea, Medio Oriente, Rusia y su impacto en los derechos humanos'
+  ],
+  'Globalización y Demografía': [
+    'Reconoce la relación que existe entre el proceso globalizador y el diario acontecer de los individuos en cualquier lugar del mundo',
+    'Distingue los principales flujos espaciales de producción y consumo de bienes y servicios a escala global',
+    'Analiza el rol y los efectos de las empresas transnacionales y las ciudades globales en la economía y el comercio mundial',
+    'Distingue el estado actual y proyecciones de cambio poblacional en Costa Rica y el mundo, y sus implicaciones socioeconómicas',
+    'Reconoce las implicaciones éticas de problemáticas como embarazo adolescente, matrimonios forzados y trata de personas en distintas regiones',
+    'Analiza las causas y características de los principales procesos de movilidad espacial: migración interna, internacional y ambiental'
+  ],
+  'Costa Rica — Primera Mitad Siglo XX': [
+    'Analiza los factores internos y externos que favorecieron el desarrollo de las crisis económicas de la economía agroexportadora costarricense',
+    'Analiza las características de las luchas sociales y políticas de la primera mitad del siglo XX en Costa Rica',
+    'Conoce las características del sistema electoral costarricense y las principales reformas electorales de la primera mitad del siglo XX',
+    'Reconoce la importancia y significación social de la Reforma Social de la década de 1940 en Costa Rica',
+    'Distingue las causas y consecuencias de la Guerra Civil de 1948 y los cambios introducidos en la Constitución de 1949',
+    'Comprende la espiral de violencia que vivió la sociedad costarricense y su impacto en la vida cotidiana previa a 1948'
+  ],
+  'Costa Rica — Segunda Mitad Siglo XX al Presente': [
+    'Reconoce la importancia de las instituciones económicas y sociales establecidas en la segunda mitad del siglo XX para transformar la estructura del país',
+    'Analiza las principales transformaciones sociales y económicas entre 1950 y 1980 en Costa Rica y sus efectos en las condiciones de vida',
+    'Identifica las causas del agotamiento del modelo de diversificación productiva e industrialización sustitutiva en Costa Rica entre 1950 y 1980',
+    'Comprende las causas internas y externas de la crisis de 1980 en Costa Rica y sus repercusiones en las condiciones de vida',
+    'Distingue la respuesta a la crisis implementada por los gobiernos mediante programas de ajuste estructural y liberalización económica',
+    'Analiza los cambios sociales promovidos por el nuevo estilo de desarrollo de promoción de exportaciones y apertura comercial desde fines de los 80'
+  ]
+};
+const BLOQUES = Object.keys(CFG);
+const REC = {
+  'Historia Mundial s. XIX-XX': 'Repasá el imperialismo, las guerras mundiales, la Revolución rusa y sus consecuencias sociales.',
+  'Guerra Fría y Mundo Contemporáneo': 'Estudiá la rivalidad EE.UU.-URSS, descolonización, colapso soviético y conflictos actuales.',
+  'Globalización y Demografía': 'Trabajá globalización, flujos económicos, cambios demográficos y fenómenos migratorios.',
+  'Costa Rica — Primera Mitad Siglo XX': 'Repasá la economía agroexportadora, luchas sociales, Reforma del 40 y Guerra Civil del 48.',
+  'Costa Rica — Segunda Mitad Siglo XX al Presente': 'Reforzá el Estado benefactor, crisis del 80, ajuste estructural y apertura comercial.'
+};
+const TOTAL = 20;
+let E = {};
+function resetE(){ E={idx:0,intentos:0,corrPrimer:0,conAyuda:0,bloques:new Set(),data:null,bloqueActual:'',historial:[]}; }
+function iniciar(){ resetE(); document.getElementById('P-inicio').style.display='none'; document.getElementById('P-resumen').style.display='none'; document.getElementById('prog-wrap').style.display='flex'; document.getElementById('card-ejercicio').style.display='block'; generar(); }
+function mostrarResumen(){ document.getElementById('prog-wrap').style.display='none'; document.getElementById('card-ejercicio').style.display='none'; document.getElementById('P-resumen').style.display='block'; const pct=Math.round((E.corrPrimer/TOTAL)*100); let trofeo,titulo,color; if(pct>=90){trofeo='🏆';titulo='¡Resultado sobresaliente!';color='#065F46';}else if(pct>=80){trofeo='🥇';titulo='¡Muy buen desempeño!';color='#065F46';}else if(pct>=70){trofeo='🥈';titulo='¡Buen trabajo!';color='#1E40AF';}else if(pct>=60){trofeo='🥉';titulo='Hay áreas por reforzar';color='#92400E';}else{trofeo='💪';titulo='¡Seguí practicando!';color='#991B1B';} document.getElementById('trophy').textContent=trofeo; document.getElementById('res-titulo').textContent=titulo; document.getElementById('nota-valor').textContent=pct+'%'; document.getElementById('nota-valor').style.color=color; document.getElementById('nota-label').textContent=pct>=90?'Excelente':pct>=80?'Muy bueno':pct>=70?'Bueno':pct>=60?'Regular':'Necesita refuerzo'; document.getElementById('s-cor').textContent=E.corrPrimer; document.getElementById('s-ay').textContent=E.conAyuda; document.getElementById('s-bl').textContent=E.bloques.size; const bf={}; E.historial.forEach(h=>{if(!bf[h.bloque])bf[h.bloque]={ok:0,total:0};bf[h.bloque].total++;if(h.ok)bf[h.bloque].ok++;}); const div=document.getElementById('mejoras-lista');div.innerHTML='';let hay=false; Object.entries(bf).forEach(([bl,d])=>{const p=Math.round((d.ok/d.total)*100);if(p<80){hay=true;div.innerHTML+=`<div class="mejora-item"><div class="mejora-bloque">📌 ${bl} — ${p}% de logro</div><div class="mejora-rec">${REC[bl]||'Repasá los contenidos de este bloque.'}</div></div>`;}}); if(!hay)div.innerHTML='<div style="color:#065F46;font-weight:700;text-align:center;padding:12px;">✅ ¡Excelente desempeño en todos los bloques!</div>'; document.getElementById('mejoras-wrap').style.display='block'; if(pct>=80)confetti(); }
+function actualizarProg(){ document.getElementById('prog-label').textContent=`Ejercicio ${E.idx+1} de ${TOTAL}`; document.getElementById('prog-fill').style.width=`${(E.idx/TOTAL)*100}%`; const h=document.getElementById('hearts');h.innerHTML=''; for(let i=0;i<3;i++){const s=document.createElement('span');s.textContent=i<(3-E.intentos)?'❤️':'🖤';h.appendChild(s);} }
+async function generar(){ const bn=BLOQUES[E.idx%BLOQUES.length]; const afs=CFG[bn]; const af=afs[Math.floor(Math.random()*afs.length)]; E.bloques.add(bn); E.bloqueActual=bn; E.intentos=0; document.getElementById('bloque-pill').textContent=bn; document.getElementById('loader').style.display='flex'; document.getElementById('contenido').style.display='none'; document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); actualizarProg(); try{ const res=await fetch('/api/generar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({materia:'sec-ss',bloque:bn,afirmacion:af,nivel:'secundaria'})}); if(!res.ok){const e=await res.json();throw new Error(e.error||'Error del servidor');} E.data=await res.json(); mostrar(); }catch(err){ document.getElementById('loader-msg').textContent='⚠️ '+err.message+'. Reintentando...'; setTimeout(generar,3000); } }
+function mostrar(){ document.getElementById('loader').style.display='none'; document.getElementById('contenido').style.display='block'; const d=E.data; const cb=document.getElementById('ctx-box'); if(d.contexto_situacional?.trim()){cb.textContent=d.contexto_situacional;cb.style.display='block';}else cb.style.display='none'; document.getElementById('enunciado').textContent=d.enunciado; const op=document.getElementById('opciones');op.innerHTML=''; ['A','B','C','D'].forEach(l=>{const b=document.createElement('button');b.className='opcion';b.innerHTML=`<span class="letra">${l}</span><span>${d.opciones[l]}</span>`;b.onclick=()=>responder(l);op.appendChild(b);}); }
+function responder(sel){ const d=E.data,ok=sel===d.clave; E.intentos++; const bots=document.querySelectorAll('.opcion'); const fb=document.getElementById('feedback'); if(ok){ bots.forEach(b=>{const l=b.querySelector('.letra').textContent;if(l===sel)b.classList.add('correcta');else b.setAttribute('disabled','');}); if(E.intentos===1){E.corrPrimer++;E.historial.push({bloque:E.bloqueActual,ok:true});fb.className='feedback ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}else if(E.intentos===2){E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}else{E.conAyuda++;E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback warn';fb.textContent='👍 Correcto. Repasá el análisis de contexto.';} document.getElementById('btn-sig').classList.add('vis'); }else{ bots.forEach(b=>{if(b.querySelector('.letra').textContent===sel)b.classList.add('incorrecta');}); if(E.intentos===1){fb.className='feedback err';fb.textContent='❌ No es correcta. Analizá el contexto con la pista.';document.getElementById('pista-texto').textContent=d.pista;document.getElementById('pista-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);}else if(E.intentos===2){fb.className='feedback err';fb.textContent='❌ Casi. Veamos el análisis completo:';const pd=document.getElementById('pasos-div');pd.innerHTML='';d.pasos_resolucion.forEach((p,i)=>{pd.innerHTML+=`<div class="paso"><div class="num">${i+1}</div><p><strong>${p.titulo}:</strong> ${p.explicacion}</p></div>`;});document.getElementById('ayuda-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);} actualizarProg(); } }
+function siguiente(){ E.idx++; if(E.idx>=TOTAL){mostrarResumen();return;} document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); generar(); }
+function confetti(){ const col=['#B45309','#F59E0B','#10B981','#2563EB','#EF4444']; for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti-p';Object.assign(d.style,{top:'-10px',left:Math.random()*100+'vw',width:(Math.random()*9+5)+'px',height:(Math.random()*9+5)+'px',borderRadius:Math.random()>.5?'50%':'2px',background:col[Math.floor(Math.random()*col.length)],animationDelay:(Math.random()*.6)+'s',animationDuration:(Math.random()*.8+1.4)+'s'});document.body.appendChild(d);setTimeout(()=>d.remove(),2800);} }
+</script>
+<footer style="width:100%;text-align:center;padding:18px 0 28px;font-family:'Nunito',sans-serif;font-size:.95rem;color:#94A3B8;font-weight:600;letter-spacing:.3px;">Diseñado por <strong style="color:#1B3A6B;">Eduardo Romero C.</strong> · SDBHS · DGEC 2026</footer>
+</body>
+</html>

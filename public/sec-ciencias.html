@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciencias Sec · TutoríaPRO</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .prog-fill    { background: linear-gradient(90deg,#0F766E,#0284C7); }
+  .bloque-pill  { background: #CCFBF1; color: #0F766E; }
+  .ctx-box      { background: #F0FDFA; color: #134E4A; border-color: #0F766E; }
+  .btn-siguiente{ background: #0F766E; }
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">🔬</span>
+  <div class="info"><h1>CienciasPRO</h1><p>Física · Química · Biología · 11° Año · SDBHS</p></div>
+  <button class="back-btn" onclick="location.href='secundaria.html'">← Inicio</button>
+  <span class="badge">DGEC 2026</span>
+</header>
+<main id="main-content">
+  <div id="P-inicio" class="card" style="text-align:center;">
+    <div style="font-size:4rem;margin-bottom:14px;">🔬</div>
+    <h2 style="font-size:1.5rem;font-weight:900;color:#0F766E;margin-bottom:8px;">¡Practicá Ciencias!</h2>
+    <p style="color:var(--texto-2);font-weight:600;font-size:.92rem;margin-bottom:24px;line-height:1.6;">Ejercicios de Física, Química y Biología integradas, alineados a la Tabla 7 de la Prueba Nacional Estandarizada Sumativa 2026 para colegios diurnos y técnicos.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px;text-align:left;">
+      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">⚡ Física</div>
+      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">⚗️ Química</div>
+      <div style="background:#CCFBF1;border-radius:10px;padding:9px 12px;font-size:.8rem;font-weight:700;color:#0F766E;">🧬 Biología</div>
+    </div>
+    <button onclick="iniciar()" style="background:linear-gradient(135deg,#0F766E,#134E4A);color:#fff;border:none;border-radius:14px;padding:16px 44px;font-size:1.05rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;">¡Comenzar práctica! 🚀</button>
+  </div>
+  <div id="prog-wrap" class="prog-wrap" style="display:none;">
+    <span id="prog-label" class="prog-label">Ejercicio 1 de 20</span>
+    <div class="prog-track"><div id="prog-fill" class="prog-fill" style="width:0%"></div></div>
+    <div id="hearts" class="hearts"></div>
+    <span id="bloque-pill" class="bloque-pill">—</span>
+  </div>
+  <div id="card-ejercicio" class="card" style="display:none;">
+    <div id="loader" class="loader"><div class="spinner"></div><p id="loader-msg">Generando ejercicio...</p></div>
+    <div id="contenido" style="display:none;">
+      <div id="ctx-box" class="ctx-box" style="display:none;"></div>
+      <div id="enunciado" class="enunciado"></div>
+      <div id="opciones" class="opciones"></div>
+      <div id="pista-box" class="pista-box"><div class="pista-lbl">💡 Pista</div><div id="pista-texto"></div></div>
+      <div id="ayuda-box" class="ayuda-box"><div class="ayuda-lbl">🔬 Así se explica</div><div id="pasos-div"></div></div>
+      <div id="feedback" class="feedback"></div>
+      <button id="btn-sig" class="btn-siguiente" onclick="siguiente()">Siguiente ejercicio →</button>
+    </div>
+  </div>
+  <div id="P-resumen" class="card" style="display:none;">
+    <div class="resumen">
+      <span class="trophy" id="trophy">🏆</span>
+      <h2 id="res-titulo">¡Sesión completada!</h2>
+      <div class="nota-wrap"><div class="nota-valor" id="nota-valor">—</div><div class="nota-label" id="nota-label">—</div></div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="sv" id="s-cor">0</div><div class="sl">Al primer intento</div></div>
+        <div class="stat-box"><div class="sv" id="s-ay">0</div><div class="sl">Con ayuda</div></div>
+        <div class="stat-box"><div class="sv" id="s-bl">0</div><div class="sl">Bloques practicados</div></div>
+      </div>
+      <div class="mejoras-wrap" id="mejoras-wrap" style="display:none;"><div class="mejoras-titulo">📊 Puntos a mejorar</div><div id="mejoras-lista"></div></div>
+      <div class="res-btns">
+        <button class="btn-res btn-nueva" onclick="iniciar()">🔄 Nueva sesión</button>
+        <a href="secundaria.html" class="btn-res btn-inicio">📚 Cambiar materia</a>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const CFG = {
+  'Física — Movimiento y Fuerzas': [
+    'Determina las características particulares de MRU, MRUA, Caída libre y proyectiles a partir de situaciones concretas del entorno',
+    'Analiza por medio de gráficas la relación entre variables: distancia-tiempo, desplazamiento-tiempo, rapidez-tiempo y velocidad-tiempo',
+    'Aplica los conceptos básicos de las Leyes de Newton (inercia, fuerza neta, rozamiento) en situaciones cotidianas',
+    'Analiza la Ley de Gravitación Universal y resuelve problemas de gravitación, campo gravitacional y velocidad orbital'
+  ],
+  'Física — Energía y Electricidad': [
+    'Analiza la relación de conceptos de Trabajo, Energía y Potencia en la resolución de casos en el contexto cotidiano',
+    'Analiza conceptos de Hidrostática: densidad, presión, Principio de Pascal, Principio de Arquímedes y Ley de Boyle',
+    'Analiza las variables de la electricidad y electrostática utilizando la Ley de Coulomb, campo eléctrico y potencial eléctrico',
+    'Analiza las características de la corriente eléctrica y la Ley de Ohm en circuitos en serie, paralelo y mixtos',
+    'Analiza las características del electromagnetismo, su relación con fenómenos naturales y el campo magnético',
+    'Describe las características, clasificación y usos de las ondas mecánicas y electromagnéticas'
+  ],
+  'Química — Materia y Estructura': [
+    'Clasifica materiales del entorno según constitución, características y métodos de separación de mezclas homogéneas y heterogéneas',
+    'Diferencia metales, no metales y metaloides por sus características y ubicación en la tabla periódica',
+    'Analiza la estructura del átomo: número másico, atómico, electrones, protones y neutrones en átomos neutros, iones e isótopos',
+    'Distingue la organización de electrones en niveles, subniveles y orbitales, estructuras de Lewis y propiedades periódicas',
+    'Distingue sustancias con enlaces iónicos, metálicos, covalentes polar y no polar según sus características'
+  ],
+  'Química — Transformaciones y Disoluciones': [
+    'Aplica las reglas de nomenclatura de los sistemas Stock y estequiométrico para nombrar diferentes tipos de compuestos',
+    'Resuelve problemas con relaciones estequiométricas entre mol, masa molar, número de Avogadro, reactivos y productos',
+    'Analiza los factores que afectan la solubilidad, la velocidad de disolución y las propiedades coligativas de las disoluciones',
+    'Resuelve situaciones con unidades de concentración físicas y químicas: masa en masa, masa en volumen, molaridad, ppm',
+    'Analiza los principios básicos de la Química orgánica y aplica nomenclatura de hidrocarburos y grupos funcionales'
+  ],
+  'Biología — Ecosistemas y Poblaciones': [
+    'Analiza la interrelación entre las adaptaciones de las diversas formas de vida y el entorno biológico y físico',
+    'Analiza los conceptos de especie, población, comunidad, ecosistema y biodiversidad con ejemplos concretos',
+    'Distingue diversidad de especies, de ecosistemas y genética; calcula índices de biodiversidad',
+    'Comprende las propiedades de las poblaciones biológicas: natalidad, mortalidad, potencial biótico y resistencia ambiental',
+    'Analiza los patrones de crecimiento poblacional exponencial, logístico y decreciente, y los patrones de distribución',
+    'Analiza las relaciones intraespecíficas e interespecíficas: mutualismo, parasitismo, depredación, comensalismo'
+  ],
+  'Biología — Genética y Evolución': [
+    'Analiza la transferencia de energía entre niveles tróficos, cadenas alimentarias, redes tróficas y ciclos biogeoquímicos',
+    'Analiza la variabilidad genética: estructura del ADN y ARN, duplicación, transcripción, traducción y síntesis de proteínas',
+    'Distingue términos básicos de genética mendeliana y resuelve cruces de herencia con cuadros de Punnett',
+    'Analiza las evidencias evolutivas y los principales mecanismos del cambio evolutivo: selección natural, mutación, deriva genética',
+    'Analiza los procesos de recuperación y restauración ecológica y los principios del desarrollo sostenible'
+  ]
+};
+const BLOQUES = Object.keys(CFG);
+const REC = {
+  'Física — Movimiento y Fuerzas': 'Repasá cinemática, leyes de Newton y gravitación universal con ejercicios de contexto real.',
+  'Física — Energía y Electricidad': 'Reforzá trabajo-energía, hidrostática, circuitos eléctricos, ondas y electromagnetismo.',
+  'Química — Materia y Estructura': 'Practicá clasificación de mezclas, tabla periódica, estructura atómica y tipos de enlace.',
+  'Química — Transformaciones y Disoluciones': 'Trabajá nomenclatura química, estequiometría, disoluciones y química orgánica.',
+  'Biología — Ecosistemas y Poblaciones': 'Repasá biodiversidad, ecología de poblaciones e interacciones entre organismos.',
+  'Biología — Genética y Evolución': 'Reforzá flujo energético, genética, herencia mendeliana, evolución y ecología.'
+};
+const TOTAL = 20;
+let E = {};
+function resetE(){ E={idx:0,intentos:0,corrPrimer:0,conAyuda:0,bloques:new Set(),data:null,bloqueActual:'',historial:[]}; }
+function iniciar(){ resetE(); document.getElementById('P-inicio').style.display='none'; document.getElementById('P-resumen').style.display='none'; document.getElementById('prog-wrap').style.display='flex'; document.getElementById('card-ejercicio').style.display='block'; generar(); }
+function mostrarResumen(){ document.getElementById('prog-wrap').style.display='none'; document.getElementById('card-ejercicio').style.display='none'; document.getElementById('P-resumen').style.display='block'; const pct=Math.round((E.corrPrimer/TOTAL)*100); let trofeo,titulo,color; if(pct>=90){trofeo='🏆';titulo='¡Resultado sobresaliente!';color='#065F46';}else if(pct>=80){trofeo='🥇';titulo='¡Muy buen desempeño!';color='#065F46';}else if(pct>=70){trofeo='🥈';titulo='¡Buen trabajo!';color='#1E40AF';}else if(pct>=60){trofeo='🥉';titulo='Hay áreas por reforzar';color='#92400E';}else{trofeo='💪';titulo='¡Seguí practicando!';color='#991B1B';} document.getElementById('trophy').textContent=trofeo; document.getElementById('res-titulo').textContent=titulo; document.getElementById('nota-valor').textContent=pct+'%'; document.getElementById('nota-valor').style.color=color; document.getElementById('nota-label').textContent=pct>=90?'Excelente':pct>=80?'Muy bueno':pct>=70?'Bueno':pct>=60?'Regular':'Necesita refuerzo'; document.getElementById('s-cor').textContent=E.corrPrimer; document.getElementById('s-ay').textContent=E.conAyuda; document.getElementById('s-bl').textContent=E.bloques.size; const bf={}; E.historial.forEach(h=>{if(!bf[h.bloque])bf[h.bloque]={ok:0,total:0};bf[h.bloque].total++;if(h.ok)bf[h.bloque].ok++;}); const div=document.getElementById('mejoras-lista');div.innerHTML='';let hay=false; Object.entries(bf).forEach(([bl,d])=>{const p=Math.round((d.ok/d.total)*100);if(p<80){hay=true;div.innerHTML+=`<div class="mejora-item"><div class="mejora-bloque">📌 ${bl} — ${p}% de logro</div><div class="mejora-rec">${REC[bl]||'Repasá los contenidos de este bloque.'}</div></div>`;}}); if(!hay)div.innerHTML='<div style="color:#065F46;font-weight:700;text-align:center;padding:12px;">✅ ¡Excelente desempeño en todos los bloques!</div>'; document.getElementById('mejoras-wrap').style.display='block'; if(pct>=80)confetti(); }
+function actualizarProg(){ document.getElementById('prog-label').textContent=`Ejercicio ${E.idx+1} de ${TOTAL}`; document.getElementById('prog-fill').style.width=`${(E.idx/TOTAL)*100}%`; const h=document.getElementById('hearts');h.innerHTML=''; for(let i=0;i<3;i++){const s=document.createElement('span');s.textContent=i<(3-E.intentos)?'❤️':'🖤';h.appendChild(s);} }
+async function generar(){ const bn=BLOQUES[E.idx%BLOQUES.length]; const afs=CFG[bn]; const af=afs[Math.floor(Math.random()*afs.length)]; E.bloques.add(bn); E.bloqueActual=bn; E.intentos=0; document.getElementById('bloque-pill').textContent=bn; document.getElementById('loader').style.display='flex'; document.getElementById('contenido').style.display='none'; document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); actualizarProg(); try{ const res=await fetch('/api/generar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({materia:'sec-cien',bloque:bn,afirmacion:af,nivel:'secundaria'})}); if(!res.ok){const e=await res.json();throw new Error(e.error||'Error del servidor');} E.data=await res.json(); mostrar(); }catch(err){ document.getElementById('loader-msg').textContent='⚠️ '+err.message+'. Reintentando...'; setTimeout(generar,3000); } }
+function mostrar(){ document.getElementById('loader').style.display='none'; document.getElementById('contenido').style.display='block'; const d=E.data; const cb=document.getElementById('ctx-box'); if(d.contexto_situacional?.trim()){cb.textContent=d.contexto_situacional;cb.style.display='block';}else cb.style.display='none'; document.getElementById('enunciado').textContent=d.enunciado; const op=document.getElementById('opciones');op.innerHTML=''; ['A','B','C','D'].forEach(l=>{const b=document.createElement('button');b.className='opcion';b.innerHTML=`<span class="letra">${l}</span><span>${d.opciones[l]}</span>`;b.onclick=()=>responder(l);op.appendChild(b);}); }
+function responder(sel){ const d=E.data,ok=sel===d.clave; E.intentos++; const bots=document.querySelectorAll('.opcion'); const fb=document.getElementById('feedback'); if(ok){ bots.forEach(b=>{const l=b.querySelector('.letra').textContent;if(l===sel)b.classList.add('correcta');else b.setAttribute('disabled','');}); if(E.intentos===1){E.corrPrimer++;E.historial.push({bloque:E.bloqueActual,ok:true});fb.className='feedback ok';fb.textContent='🎉 ¡Excelente! Respuesta correcta al primer intento.';confetti();}else if(E.intentos===2){E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback ok';fb.textContent='✅ ¡Bien hecho! Lo lograste en el segundo intento.';}else{E.conAyuda++;E.historial.push({bloque:E.bloqueActual,ok:false});fb.className='feedback warn';fb.textContent='👍 Correcto. Repasá los contenidos para afianzar el tema.';} document.getElementById('btn-sig').classList.add('vis'); }else{ bots.forEach(b=>{if(b.querySelector('.letra').textContent===sel)b.classList.add('incorrecta');}); if(E.intentos===1){fb.className='feedback err';fb.textContent='❌ No es correcta. Revisá la pista e intentá de nuevo.';document.getElementById('pista-texto').textContent=d.pista;document.getElementById('pista-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);}else if(E.intentos===2){fb.className='feedback err';fb.textContent='❌ Casi. Veamos la explicación:';const pd=document.getElementById('pasos-div');pd.innerHTML='';d.pasos_resolucion.forEach((p,i)=>{pd.innerHTML+=`<div class="paso"><div class="num">${i+1}</div><p><strong>${p.titulo}:</strong> ${p.explicacion}</p></div>`;});document.getElementById('ayuda-box').classList.add('vis');setTimeout(()=>{bots.forEach(b=>{if(!b.classList.contains('incorrecta'))b.removeAttribute('disabled');});},350);} actualizarProg(); } }
+function siguiente(){ E.idx++; if(E.idx>=TOTAL){mostrarResumen();return;} document.getElementById('pista-box').classList.remove('vis'); document.getElementById('ayuda-box').classList.remove('vis'); document.getElementById('feedback').className='feedback'; document.getElementById('btn-sig').classList.remove('vis'); generar(); }
+function confetti(){ const col=['#0F766E','#F59E0B','#0284C7','#10B981','#EF4444']; for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti-p';Object.assign(d.style,{top:'-10px',left:Math.random()*100+'vw',width:(Math.random()*9+5)+'px',height:(Math.random()*9+5)+'px',borderRadius:Math.random()>.5?'50%':'2px',background:col[Math.floor(Math.random()*col.length)],animationDelay:(Math.random()*.6)+'s',animationDuration:(Math.random()*.8+1.4)+'s'});document.body.appendChild(d);setTimeout(()=>d.remove(),2800);} }
+</script>
+<footer style="width:100%;text-align:center;padding:18px 0 28px;font-family:'Nunito',sans-serif;font-size:.95rem;color:#94A3B8;font-weight:600;letter-spacing:.3px;">Diseñado por <strong style="color:#1B3A6B;">Eduardo Romero C.</strong> · SDBHS · DGEC 2026</footer>
+</body>
+</html>
