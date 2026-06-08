@@ -1,0 +1,31 @@
+{
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/api/generar",
+      "destination": "/api/generar"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/generar",
+      "dest": "/api/generar.js"
+    },
+    {
+      "src": "/(.*\\.html)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/public/index.html"
+    },
+    {
+      "src": "/(.*\\.css)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/(.*\\.js)",
+      "dest": "/public/$1"
+    }
+  ]
+}
