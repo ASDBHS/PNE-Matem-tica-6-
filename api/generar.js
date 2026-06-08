@@ -50,7 +50,7 @@ function garantizarUnicas(opciones) {
   return resultado;
 }
 
-async function llamarGroq(apiKey, prompt) {
+async function llamarGroqConModelo(apiKey, prompt, modelo) {
   const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -58,14 +58,32 @@ async function llamarGroq(apiKey, prompt) {
       'Authorization': 'Bearer ' + apiKey
     },
     body: JSON.stringify({
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      model: modelo,
       max_tokens: 1500,
       temperature: 0.85,
       response_format: { type: 'json_object' },
       messages: [{ role: 'user', content: prompt }]
     })
   });
-  const datos = await groqRes.json();
+  return await groqRes.json();
+}
+
+async function llamarGroq(apiKey, prompt) {
+  // Intentar con modelo principal, si falla por rate limit usar el de respaldo
+  const modelos = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+  let datos = null;
+  let ultimoError = '';
+
+  for (var i = 0; i < modelos.length; i++) {
+    datos = await llamarGroqConModelo(apiKey, prompt, modelos[i]);
+    if (!datos.error) break;
+    ultimoError = datos.error.message || '';
+    // Solo hacer fallback si es rate limit, no otros errores
+    if (!ultimoError.includes('rate') && !ultimoError.includes('limit') && !ultimoError.includes('decommissioned') && !ultimoError.includes('deprecated')) {
+      throw new Error(ultimoError);
+    }
+  }
+
   if (datos.error) throw new Error(datos.error.message);
   const texto = datos.choices && datos.choices[0] && datos.choices[0].message
     ? datos.choices[0].message.content || ''
@@ -111,11 +129,21 @@ async function llamarGroq(apiKey, prompt) {
     ejercicio.pista = 'Revisá el contexto y relacionalo con el concepto clave del bloque temático.';
   }
 
+  // Eliminar referencias a letras de opciones en pasos (ej: "la opción B", "corresponde a A")
+  ejercicio.pasos_resolucion = ejercicio.pasos_resolucion.map(function(p) {
+    var exp = p.explicacion || '';
+    exp = exp.replace(/la opci[oó]n [ABCD]/gi, 'la respuesta correcta');
+    exp = exp.replace(/corresponde a [ABCD]/gi, 'es la respuesta correcta');
+    exp = exp.replace(/opci[oó]n [ABCD]/gi, 'respuesta correcta');
+    p.explicacion = exp;
+    return p;
+  });
+
   return ejercicio;
 }
 
-const JSON_SCHEMA = `Respondé SOLO con JSON sin backticks ni texto extra.
-IMPORTANTE: en pasos_resolucion y pista NUNCA menciones letras de opciones (A, B, C, D) — mencioná solo el valor correcto.
+const JSON_SCHEMA = `Respondé SOLO con este JSON exacto, sin backticks, sin texto antes ni después.
+REGLA CRÍTICA: en "pista" y en cada "explicacion" de pasos_resolucion JAMÁS escribas las letras A, B, C o D para referirte a opciones. Mencioná únicamente el contenido o valor correcto, nunca la letra.
 {"contexto_situacional":"...","enunciado":"...","opciones":{"A":"...","B":"...","C":"...","D":"..."},"clave":"B","pista":"...","pasos_resolucion":[{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."},{"titulo":"...","explicacion":"..."}]}`;
 
 // ══════════════════════════════════════════════════════════════
