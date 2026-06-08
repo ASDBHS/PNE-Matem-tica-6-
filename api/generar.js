@@ -58,7 +58,7 @@ async function llamarGroq(apiKey, prompt) {
       'Authorization': 'Bearer ' + apiKey
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama3-70b-8192',
       max_tokens: 1500,
       temperature: 0.85,
       response_format: { type: 'json_object' },
