@@ -50,21 +50,24 @@ async function llamarGroqConModelo(apiKey, prompt, modelo) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
     body: JSON.stringify({
-      model: modelo, max_tokens: 1500, temperature: 0.85,
+      model: modelo, max_tokens: 4000, temperature: 0.85,
+      reasoning_effort: 'low',
       response_format: { type: 'json_object' },
       messages: [{ role: 'user', content: prompt }]
     })
   });
-  return await groqRes.json();
+  try { return await groqRes.json(); }
+  catch (e) { return { error: { message: 'Respuesta no válida de Groq (HTTP ' + groqRes.status + ')' } }; }
 }
 
 function esErrorRateLimit(msg) {
-  return msg && (msg.includes('rate') || msg.includes('limit') || msg.includes('decommissioned') || msg.includes('deprecated') || msg.includes('Invalid API Key') || msg.includes('invalid_api_key'));
+  return msg && (msg.includes('rate') || msg.includes('limit') || msg.includes('decommissioned') || msg.includes('deprecated') || msg.includes('does not exist') || msg.includes('model_not_found') || msg.includes('not have access') || msg.includes('no válida') || msg.includes('Invalid API Key') || msg.includes('invalid_api_key'));
 }
 
 async function llamarGroq(keys, prompt) {
   // Intentar cada key con cada modelo hasta que una funcione
-  const modelos = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+  // llama-3.3-70b-versatile y llama-3.1-8b-instant fueron retirados por Groq (16-ago-2026)
+  const modelos = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b'];
   let ultimoError = 'Sin respuesta';
 
   for (var k = 0; k < keys.length; k++) {
@@ -78,7 +81,9 @@ async function llamarGroq(keys, prompt) {
         const ini = texto.indexOf('{');
         const fin = texto.lastIndexOf('}');
         if (ini === -1 || fin === -1) { ultimoError = 'Sin JSON válido'; continue; }
-        const ejercicio = JSON.parse(texto.substring(ini, fin + 1));
+        let ejercicio;
+        try { ejercicio = JSON.parse(texto.substring(ini, fin + 1)); }
+        catch (e) { ultimoError = 'JSON mal formado'; continue; }
         if (!ejercicio.enunciado || !ejercicio.opciones || !ejercicio.clave) { ultimoError = 'JSON incompleto'; continue; }
 
         // Sanitizar opciones
